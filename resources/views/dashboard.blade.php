@@ -15,10 +15,12 @@
             </div>
         </div>
         <div class="col-5 align-self-center">
-            <div class="app-search float-right">
-                <button class="btn btn-primary btn-rounded" id="add-user-btn" href="{{route('form')}}">Add User</button>
-            </div>
-        </div>
+    <div class="app-search float-right">
+      <a href="{{ route('users.create') }}" class="btn btn-primary btn-rounded" id="add-user-btn">Add User</a>
+
+    </div>
+</div>
+
 
     </div>
 </div>
