@@ -4,17 +4,30 @@
             <ul id="sidebarnav">
                 <li class="sidebar-item"> 
                     <a class="sidebar-link sidebar-link" href="{{ route('dashboard') }}" aria-expanded="false">
-                        <i data-feather="home" class="feather-icon"></i>
+                        <i class="fas fa-home"></i>
                         <span class="hide-menu">Dashboard</span>
                     </a>
                 </li>
                 <li class="list-divider"></li>
-                
+                <li class="nav-small-cap"><span class="hide-menu">Money Management</span></li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('tabungan.index') }}" aria-expanded="false">
+                        <i class="fas fa-piggy-bank"></i>
+                        <span class="hide-menu">Tabungan</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('kategori.index') }}" aria-expanded="false">
+                        <i class="fas fa-tag"></i>
+                        <span class="hide-menu">Kategori</span>
+                    </a>
+                </li>
+                <li class="list-divider"></li>
                 <!-- User Management Section -->
                 <li class="nav-small-cap"><span class="hide-menu">User Management</span></li>
                 <li class="sidebar-item">
                     <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-                        <i data-feather="users" class="feather-icon"></i>
+                        <i class="fas fa-users"></i>
                         <span class="hide-menu">Users</span>
                     </a>
                     <ul aria-expanded="false" class="collapse first-level base-level-line">
@@ -30,8 +43,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="list-divider"></li>
             </ul>
         </nav>
     </div>
-</aside>yy
+</aside>
