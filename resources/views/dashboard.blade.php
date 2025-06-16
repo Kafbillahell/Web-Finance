@@ -14,15 +14,14 @@
                 </nav>
             </div>
         </div>
-        <!-- <div class="col-5 align-self-center">
-            <div class="customize-input float-right">
-                <select class="custom-select custom-select-set form-control bg-white border-0 custom-shadow custom-radius">
-                    <option selected>Aug 19</option>
-                    <option value="1">July 19</option>
-                    <option value="2">Jun 19</option>
-                </select>
-            </div>
-        </div> -->
+        <div class="col-5 align-self-center">
+    <div class="app-search float-right">
+      <a href="{{ route('users.create') }}" class="btn btn-primary btn-rounded" id="add-user-btn">Add User</a>
+
+    </div>
+</div>
+
+
     </div>
 </div>
 <div class="container-fluid">
@@ -30,35 +29,20 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
+                    <h4 class="card-title">User List</h4>
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-striped" id="user-table">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">First</th>
-                                    <th scope="col">Last</th>
-                                    <th scope="col">Handle</th>
+                                    <th class="text-center" scope="col">#</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Created At</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>@mdo</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                    <td>Thornton</td>
-                                    <td>@fat</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry</td>
-                                    <td>the Bird</td>
-                                    <td>@twitter</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -68,3 +52,4 @@
     </div>
 </div>
 @endsection
+

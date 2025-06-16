@@ -13,6 +13,7 @@
     <title>Finance Web</title>
     <!-- Custom CSS -->
     <link href="{{asset('assets/css/style.min.css')}}" rel="stylesheet">
+    @yield('style')
 </head>
 
 <body>
@@ -58,5 +59,6 @@
     <script src="{{asset('assets/js/sidebarmenu.js')}}"></script>
     <!--Custom JavaScript -->
     <script src="{{asset('assets/js/custom.min.js')}}"></script>
+    @yield('scripts')
 </body>
 </html>

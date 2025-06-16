@@ -8,16 +8,28 @@ use Illuminate\Http\Request;
 
 class TabunganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tabungans = Tabungan::with('user')->latest()->paginate(10);
+        $query = Tabungan::with('user');
+        
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($user) use ($search) {
+                      $user->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $tabungans = $query->latest()->paginate(10);
         return view('tabungan.index', compact('tabungans'));
     }
 
     public function create()
     {
         $users = User::all();
-        return view('tabungan.create', compact('users'));
+        return view('tabungan.form', compact('users'));
     }
 
     public function store(Request $request)
@@ -37,7 +49,7 @@ class TabunganController extends Controller
     public function edit(Tabungan $tabungan)
     {
         $users = User::all();
-        return view('tabungan.edit', compact('tabungan', 'users'));
+        return view('tabungan.form', compact('tabungan', 'users'));
     }
 
     public function update(Request $request, Tabungan $tabungan)
