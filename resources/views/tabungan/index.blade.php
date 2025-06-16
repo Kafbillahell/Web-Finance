@@ -136,10 +136,11 @@
                     @php
                     $progress = $tabungan->target > 0 ? min(100, ($tabungan->saldo / $tabungan->target) * 100) : 0;
                     @endphp
-                    <div class="progress mt-2" style="height: 8px;">
+                    <div class="progress mt-2">
                         <div class="progress-bar bg-success" role="progressbar"
-                            style="width: {{ $progress }}%;"
+                            style="width: {{ $progress }}%"
                             aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100">
+                            <span class="sr-only">{{ $progress }}% Complete</span>
                         </div>
                     </div>
                 </div>
