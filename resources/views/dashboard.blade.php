@@ -16,7 +16,7 @@
         </div>
         <div class="col-5 align-self-center">
             <div class="app-search float-right">
-                <a href="{{ route('user.create') }}" class="btn btn-primary btn-rounded">Add User</a>
+                <button class="btn btn-primary btn-rounded" id="add-user-btn" href="{{route('form')}}">Add User</button>
             </div>
         </div>
 
@@ -29,7 +29,7 @@
                 <div class="card-body">
                     <h4 class="card-title">User List</h4>
                     <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table table-striped" id="user-table">
                             <thead>
                                 <tr>
                                     <th class="text-center" scope="col">#</th>
@@ -41,19 +41,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($users as $user)
-                                <tr>
-                                    <th scope="row" class="text-center">{{ $loop->iteration }}</th>
-                                    <td>{{ $user->username }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->role }}</td>
-                                    <td>{{ $user->created_at }}</td>
-                                    <td>
-                                        <a href="{{ route('user.edit', $user->id) }}" class="btn btn-primary btn-sm">Edit</a>
-                                        <a href="{{ route('user.delete', $user->id) }}" class="btn btn-danger btn-sm">Delete</a>
-                                    </td>
-                                </tr>
-                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -63,3 +50,4 @@
     </div>
 </div>
 @endsection
+

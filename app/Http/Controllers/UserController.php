@@ -8,15 +8,18 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('users.index', compact('users'));
+        if ($request->ajax()) {
+            $users = User::select(['id', 'name', 'email', 'role', 'created_at'])->get();
+            return response()->json(['data' => $users]);
+        }
+        return view('users.index');
     }
 
     public function create()
     {
-        return view('users.create');
+        return view('users.form');
     }
 
     public function store(Request $request)

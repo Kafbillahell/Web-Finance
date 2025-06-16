@@ -9,11 +9,9 @@ use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::resource('users', UserController::class);
+Route::resource('user', UserController::class);
+
 Route::resource('kategori', KategoriController::class);
 Route::resource('pengeluaran', PengeluaranController::class);
 Route::resource('pemasukan', PemasukanController::class);

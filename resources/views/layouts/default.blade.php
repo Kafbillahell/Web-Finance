@@ -58,5 +58,6 @@
     <script src="{{asset('assets/js/sidebarmenu.js')}}"></script>
     <!--Custom JavaScript -->
     <script src="{{asset('assets/js/custom.min.js')}}"></script>
+    @yield('scripts')
 </body>
 </html>
