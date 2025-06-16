@@ -21,3 +21,4 @@ Route::resource('dompets', DompetController::class);
 Route::resource('tabungan', TabunganController::class);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/form', [DashboardController::class, 'form'])->name('form');
