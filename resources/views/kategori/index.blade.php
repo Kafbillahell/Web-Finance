@@ -29,7 +29,42 @@
 
                     
                     <div class="table-responsive">
-                         
+                        <table class="table table-bordered table-striped">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Nama Kategori</th>
+                                    <th scope="col">Tipe Kategori</th>
+                                    <th scope="col">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($kategori as $row)
+                                <tr>
+                                    <th scope="row">{{ $loop->iteration }}</th>
+                                    <td>{{ $row->nama }}</td>
+                                    <td>{{ ucfirst($row->tipe) }}</td>
+                                    <td>
+                                        <a href="{{ url("kategori/$row->id/edit") }}" class="btn btn-sm btn-warning me-1">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <form method="POST" action="{{ route('kategori.destroy', $row->id) }}" style="display:inline-block;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                                @if($kategori->isEmpty())
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Belum ada data kategori.</td>
+                                </tr>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
