@@ -17,6 +17,7 @@
     <title>Finance Web</title>
     <!-- Custom CSS -->
     <link href="{{asset('assets/css/style.min.css')}}" rel="stylesheet">
+    @yield('style')
 </head>
 
 <body>
