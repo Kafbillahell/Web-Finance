@@ -44,7 +44,7 @@
         font-size: 1.25rem;
     }
 
-    /* .pagination {
+    .pagination {
         justify-content: center;
         margin-top: 2rem;
     }
@@ -54,6 +54,14 @@
         background-color: #f8f9fa;
         border: 1px solid #dee2e6;
         padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        transition: all 0.2s ease;
+    }
+
+    .page-link:hover {
+        color: #0d6efd;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
     }
 
     .page-item.active .page-link {
@@ -61,6 +69,7 @@
         color: #fff;
         background-color: #0d6efd;
         border-color: #0d6efd;
+        border-radius: 0.25rem;
     }
 
     .page-item.disabled .page-link {
@@ -68,7 +77,8 @@
         pointer-events: none;
         background-color: #fff;
         border-color: #dee2e6;
-    } */
+        border-radius: 0.25rem;
+    }
 </style>
 @endsection
 @section('content')
@@ -107,7 +117,7 @@
     <div class="row">
         @foreach ($tabungans as $tabungan)
         <div class="col-12 mb-4">
-            <div class="savings-card p-4 shadow rounded bg-white">
+            <div class="savings-card">
                 <div class="d-flex align-items-center mb-3">
                     <i class="i_tbng fas fa-piggy-bank text-success"></i>
                     <h4 class="mb-0 fw-bold">{{ $tabungan->nama ?? 'Unnamed Goal' }}</h4>
@@ -155,10 +165,73 @@
         </div>
         @endforeach
     </div>
-    <!-- `
-        <div class="mt-4">
-            {{ $tabungans->links() }}
-        </div>` -->
+    
+    <!-- Custom Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination mb-0">
+                @if ($tabungans->onFirstPage())
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="fas fa-chevron-left"></i>
+                        </span>
+                    </li>
+                @else
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $tabungans->previousPageUrl() }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                @endif
+
+                @if($tabungans->currentPage() > 3)
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $tabungans->url(1) }}">1</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                @endif
+
+                @for ($i = $tabungans->currentPage() - 2; $i <= $tabungans->currentPage() + 2; $i++)
+                    @if ($i >= 1 && $i <= $tabungans->lastPage())
+                        @if ($i == $tabungans->currentPage())
+                            <li class="page-item active">
+                                <span class="page-link">{{ $i }}</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $tabungans->url($i) }}">{{ $i }}</a>
+                            </li>
+                        @endif
+                    @endif
+                @endfor
+
+                @if($tabungans->currentPage() < $tabungans->lastPage() - 2)
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $tabungans->url($tabungans->lastPage()) }}">{{ $tabungans->lastPage() }}</a>
+                    </li>
+                @endif
+
+                @if ($tabungans->hasMorePages())
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $tabungans->nextPageUrl() }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                @else
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </li>
+                @endif
+            </ul>
+        </nav>
+    </div>
 </div>
 
 @endsection
