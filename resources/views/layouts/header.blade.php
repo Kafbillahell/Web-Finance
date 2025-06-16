@@ -7,25 +7,18 @@
             <!-- ============================================================== -->
             <!-- Logo -->
             <!-- ============================================================== -->
-         <div class="navbar-brand">
-    <!-- Logo icon -->
-    <a href="{{ url('/') }}">
-        <b class="logo-icon">
-            <!-- Dark Logo icon -->
-            <img src="{{ asset('assets/images/logo-icon.png') }}" alt="homepage" class="dark-logo" />
-            <!-- Light Logo icon -->
-            <img src="{{ asset('assets/images/logo-icon.png') }}" alt="homepage" class="light-logo" />
-        </b>
-        <!--End Logo icon -->
-        <!-- Logo text -->
-        <span class="logo-text">
-            <!-- dark Logo text -->
-            <img src="{{ asset('assets/images/logo-text.png') }}" alt="homepage" class="dark-logo" />
-            <!-- Light Logo text -->
-            <img src="{{ asset('assets/images/logo-light-text.png') }}" class="light-logo" alt="homepage" />
-        </span>
-    </a>
-</div>
+            <div class="navbar-brand">
+                <!-- Logo icon -->
+                <a href="{{ url('/') }}">
+                    <div class="flex items-center gap-4 mb-10">
+                        <svg class="h-12 w-12-400" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" x2="12" y1="2" y2="22"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <span class="text-2xl font-bold text-primary">FinDash</span>
+                    </div>
+                </a>
+            </div>
 
             <!-- ============================================================== -->
             <!-- End Logo -->
