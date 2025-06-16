@@ -14,15 +14,12 @@
                 </nav>
             </div>
         </div>
-        <!-- <div class="col-5 align-self-center">
-            <div class="customize-input float-right">
-                <select class="custom-select custom-select-set form-control bg-white border-0 custom-shadow custom-radius">
-                    <option selected>Aug 19</option>
-                    <option value="1">July 19</option>
-                    <option value="2">Jun 19</option>
-                </select>
+        <div class="col-5 align-self-center">
+            <div class="app-search float-right">
+                <a href="{{ route('user.create') }}" class="btn btn-primary btn-rounded">Add User</a>
             </div>
-        </div> -->
+        </div>
+
     </div>
 </div>
 <div class="container-fluid">
@@ -40,7 +37,7 @@
                                     <th scope="col">Email</th>
                                     <th scope="col">Role</th>
                                     <th scope="col">Created At</th>
-                                    <!-- <th scope="col">Action</th> -->
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,10 +48,10 @@
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->role }}</td>
                                     <td>{{ $user->created_at }}</td>
-                                    <!-- <td>
+                                    <td>
                                         <a href="{{ route('user.edit', $user->id) }}" class="btn btn-primary btn-sm">Edit</a>
                                         <a href="{{ route('user.delete', $user->id) }}" class="btn btn-danger btn-sm">Delete</a>
-                                    </td> -->
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
