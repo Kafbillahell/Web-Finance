@@ -23,13 +23,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 });
 
-<<<<<<< HEAD
 Route::resource('transaksi', TransaksiController::class);
 Route::resource('dompet', DompetController::class);
 Route::resource('tabungan', TabunganController::class);
 Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');
 Route::post('/tabungan/{id}/withdraw-saldo', [TabunganController::class, 'withdrawSaldo'])->name('tabungan.withdrawSaldo');
-=======
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
@@ -47,4 +45,3 @@ Route::middleware('auth')->group(function () {
     Route::resource('tabungan', TabunganController::class);
     Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');
 });
->>>>>>> 73470c1855303e355059aff460a1ddcda3ccbe52
