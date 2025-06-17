@@ -3,19 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dompet;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class DompetController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $dompets = Dompet::with('user')->latest()->get();
-        return view('dompets.index', compact('dompets'));
-    }
+        $dompets = Dompet::latest()->get();
+        
+        if (!$dompets) {
+            $dompets = collect([]);
+        }
 
+        // Get recent transactions
+        $recentTransactions = Transaksi::with('dompet', 'kategori')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $total_dompet = $dompets->count();
+        $total_saldo = $dompets->sum('saldo');
+        $jenis_dompet = $dompets->pluck('nama')->unique()->count();
+        $dompet_terpilih = $dompets->take(4);
+
+        return view('dompet.index', compact('dompets', 'total_dompet', 'total_saldo', 'jenis_dompet', 'dompet_terpilih', 'recentTransactions'));
+    }
     public function create()
     {
-        return view('dompets.create');
+        $users = User::all();
+        return view('dompet.form', compact('users'));
     }
 
     public function store(Request $request)
@@ -28,12 +46,13 @@ class DompetController extends Controller
 
         Dompet::create($request->all());
 
-        return redirect()->route('dompets.index')->with('success', 'Berhasil ditambahkan');
+        return redirect()->route('dompet.index')->with('success', 'Berhasil ditambahkan');
     }
 
     public function edit(Dompet $dompet)
     {
-        return view('dompets.edit', compact('dompet'));
+        $users = User::all();
+        return view('dompet.form', compact('dompet', 'users'));
     }
 
     public function update(Request $request, Dompet $dompet)
@@ -46,13 +65,13 @@ class DompetController extends Controller
 
         $dompet->update($request->all());
 
-        return redirect()->route('dompets.index')->with('success', 'Berhasil diperbarui');
+        return redirect()->route('dompet.index')->with('success', 'Berhasil diperbarui');
     }
 
     public function destroy(Dompet $dompet)
     {
         $dompet->delete();
 
-        return redirect()->route('dompets.index')->with('success', 'Berhasil dihapus');
+        return redirect()->route('dompet.index')->with('success', 'Berhasil dihapus');
     }
 }
