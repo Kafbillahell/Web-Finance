@@ -27,26 +27,6 @@
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
     }
 
-    .table-custom thead th {
-        background-color: #ffffff;
-        border-bottom: 2px solid #dee2e6;
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .table-custom tbody tr {
-        background-color: #ffffff;
-    }
-
-    .table-custom tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
-    .table-custom td,
-    .table-custom th {
-        vertical-align: middle;
-    }
-
     .transaction-icon {
         width: 40px;
         height: 40px;

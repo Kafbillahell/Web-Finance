@@ -2,9 +2,9 @@
     <div class="scroll-sidebar" data-sidebarbg="skin6">
         <nav class="sidebar-nav">
             <ul id="sidebarnav">
-                <li class="sidebar-item"> 
+                <li class="sidebar-item">
                     <a class="sidebar-link sidebar-link" href="{{ route('dashboard') }}" aria-expanded="false">
-                        <i class="fas fa-home"></i>
+                        <i class="fas fa-tachometer-alt"></i>
                         <span class="hide-menu">Dashboard</span>
                     </a>
                 </li>
@@ -23,8 +23,14 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('dompet.index') }}" aria-expanded="false">
+                        <i class="fas fa-credit-card"></i>
+                        <span class="hide-menu">Dompet</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a class="sidebar-link" href="{{ route('transaksi.index') }}" aria-expanded="false">
-                        <i class="fas fa-tag"></i>
+                        <i class="fas fa-exchange-alt"></i>
                         <span class="hide-menu">Transaksi</span>
                     </a>
                 </li>
