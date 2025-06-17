@@ -11,14 +11,14 @@ class TabunganController extends Controller
     public function index(Request $request)
     {
         $query = Tabungan::with('user');
-        
+
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($user) use ($search) {
-                      $user->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('user', function ($user) use ($search) {
+                        $user->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -70,5 +70,30 @@ class TabunganController extends Controller
     {
         $tabungan->delete();
         return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil dihapus.');
+    }
+
+    public function addSaldo(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $tabungan = Tabungan::findOrFail($id);
+
+        // if (auth()->id() !== $tabungan->user_id) {
+        //     return response()->json([
+        //         'error' => true,
+        //         'message' => 'Unauthorized'
+        //     ], 200);
+        // }
+
+        $tabungan->saldo += $request->amount;
+        $tabungan->save();
+
+        return response()->json([
+            'saldo' => $tabungan->saldo,
+            'target' => $tabungan->target,
+            'saldo_formatted' => number_format($tabungan->saldo, 2, ',', '.')
+        ], 200);
     }
 }

@@ -31,3 +31,4 @@ Route::resource('pengeluaran', PengeluaranController::class);
 Route::resource('pemasukan', PemasukanController::class);
 Route::resource('dompets', DompetController::class);
 Route::resource('tabungan', TabunganController::class);
+Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');

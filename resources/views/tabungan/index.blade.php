@@ -124,15 +124,14 @@
                 </div>
 
                 <div class="mb-3">
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between" data-id="{{ $tabungan->id }}">
                         <small class="text-muted">Saldo</small>
-                        <small class="fw-semibold">Rp {{ number_format($tabungan->saldo, 2, ',', '.') }}</small>
+                        <small class="fw-semibold" id="saldo-{{ $tabungan->id }}">Rp {{ number_format($tabungan->saldo, 2, ',', '.') }}</small>
                     </div>
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between" data-id="{{ $tabungan->id }}">
                         <small class="text-muted">Target</small>
                         <small class="fw-semibold">Rp {{ number_format($tabungan->target, 2, ',', '.') }}</small>
                     </div>
-
                     @php
                     $progress = $tabungan->target > 0 ? min(100, ($tabungan->saldo / $tabungan->target) * 100) : 0;
                     @endphp
@@ -143,6 +142,19 @@
                             <span class="sr-only">{{ $progress }}% Complete</span>
                         </div>
                     </div>
+                    <div class="mt-2">
+                        <div class="input-group">
+                            <input type="number" name="amount" class="form-control form-control-sm add-saldo-input" placeholder="Tambah saldo" required min="1">
+                            <button type="button" class="btn btn-success btn-sm add-saldo-btn" data-id="{{ $tabungan->id }}">Tambah</button>
+                        </div>
+                    </div>
+                    <!-- <form action="{{ route('tabungan.addSaldo', $tabungan->id) }}" method="POST" class="mt-2">
+                        @csrf
+                        <div class="input-group">
+                            <input type="number" name="amount" class="form-control form-control-sm" placeholder="Tambah saldo" required min="1">
+                            <button type="submit" class="btn btn-success btn-sm">Tambah</button>
+                        </div>
+                    </form> -->
                 </div>
 
                 <div class="d-flex justify-content-between small text-muted mb-3">
@@ -166,73 +178,124 @@
         </div>
         @endforeach
     </div>
-    
-    <!-- Custom Pagination -->
+
     <div class="d-flex justify-content-center mt-4">
         <nav aria-label="Page navigation">
             <ul class="pagination mb-0">
                 @if ($tabungans->onFirstPage())
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="fas fa-chevron-left"></i>
-                        </span>
-                    </li>
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                </li>
                 @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $tabungans->previousPageUrl() }}">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    </li>
+                <li class="page-item">
+                    <a class="page-link" href="{{ $tabungans->previousPageUrl() }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
                 @endif
 
                 @if($tabungans->currentPage() > 3)
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $tabungans->url(1) }}">1</a>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
+                <li class="page-item">
+                    <a class="page-link" href="{{ $tabungans->url(1) }}">1</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
                 @endif
 
                 @for ($i = $tabungans->currentPage() - 2; $i <= $tabungans->currentPage() + 2; $i++)
                     @if ($i >= 1 && $i <= $tabungans->lastPage())
                         @if ($i == $tabungans->currentPage())
-                            <li class="page-item active">
-                                <span class="page-link">{{ $i }}</span>
-                            </li>
+                        <li class="page-item active">
+                            <span class="page-link">{{ $i }}</span>
+                        </li>
                         @else
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $tabungans->url($i) }}">{{ $i }}</a>
-                            </li>
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $tabungans->url($i) }}">{{ $i }}</a>
+                        </li>
                         @endif
-                    @endif
-                @endfor
+                        @endif
+                        @endfor
 
-                @if($tabungans->currentPage() < $tabungans->lastPage() - 2)
-                    <li class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $tabungans->url($tabungans->lastPage()) }}">{{ $tabungans->lastPage() }}</a>
-                    </li>
-                @endif
+                        @if($tabungans->currentPage() < $tabungans->lastPage() - 2)
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $tabungans->url($tabungans->lastPage()) }}">{{ $tabungans->lastPage() }}</a>
+                            </li>
+                            @endif
 
-                @if ($tabungans->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $tabungans->nextPageUrl() }}">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </li>
-                @else
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="fas fa-chevron-right"></i>
-                        </span>
-                    </li>
-                @endif
+                            @if ($tabungans->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $tabungans->nextPageUrl() }}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            @else
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            </li>
+                            @endif
             </ul>
         </nav>
     </div>
 </div>
+@endsection
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        $('.add-saldo-btn').click(function() {
+            const button = $(this);
+            const id = button.data('id');
+            const input = button.closest('.input-group').find('.add-saldo-input');
+            const amount = parseFloat(input.val());
 
+            if (isNaN(amount) || amount <= 0) {
+                alert('Masukkan nominal yang valid');
+                return;
+            }
+
+            $.ajax({
+                url: '/tabungan/' + id + '/add-saldo',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    amount: amount
+                },
+                success: function(response) {
+                    // Update the saldo display
+                    $('#saldo-' + id).text('Rp ' + response.saldo_formatted);
+
+                    // Update the progress bar
+                    const progressBar = $('[data-id="' + id + '"]').find('.progress-bar');
+                    const newProgress = Math.min(100, (response.saldo / response.target) * 100);
+                    progressBar.css('width', newProgress + '%');
+                    progressBar.attr('aria-valuenow', newProgress);
+                    progressBar.find('.sr-only').text(newProgress + '% Complete');
+
+                    // Update the progress bar's parent div to trigger reflow
+                    const progressBarParent = progressBar.parent();
+                    progressBarParent.css('opacity', '0.99');
+                    setTimeout(() => progressBarParent.css('opacity', '1'), 10);
+
+                    input.val('');
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr.responseText);
+                    try {
+                        const error = JSON.parse(xhr.responseText);
+                        alert(error.message || 'Gagal menambahkan saldo');
+                    } catch (e) {
+                        alert('Gagal menambahkan saldo. Error: ' + xhr.status + ' ' + xhr.statusText);
+                    }
+                }
+            });
+        });
+    });
+</script>
 @endsection
