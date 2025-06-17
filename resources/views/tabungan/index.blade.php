@@ -143,18 +143,15 @@
                         </div>
                     </div>
                     <div class="mt-2">
-                        <div class="input-group">
+                        <div class="input-group mt-2">
                             <input type="number" name="amount" class="form-control form-control-sm add-saldo-input" placeholder="Tambah saldo" required min="1">
                             <button type="button" class="btn btn-success btn-sm add-saldo-btn" data-id="{{ $tabungan->id }}">Tambah</button>
                         </div>
-                    </div>
-                    <!-- <form action="{{ route('tabungan.addSaldo', $tabungan->id) }}" method="POST" class="mt-2">
-                        @csrf
-                        <div class="input-group">
-                            <input type="number" name="amount" class="form-control form-control-sm" placeholder="Tambah saldo" required min="1">
-                            <button type="submit" class="btn btn-success btn-sm">Tambah</button>
+                        <div class="input-group mt-2">
+                            <input type="number" name="amount" class="form-control form-control-sm add-saldo-input" placeholder="Tarik saldo" required min="1">
+                            <button type="button" class="btn btn-danger btn-sm add-saldo-btn" data-id="{{ $tabungan->id }}">Tarik</button>
                         </div>
-                    </form> -->
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between small text-muted mb-3">
@@ -260,14 +257,23 @@
                 return;
             }
 
+            const isWithdraw = button.hasClass('btn-danger');
+            const url = isWithdraw ? '/tabungan/' + id + '/withdraw-saldo' : '/tabungan/' + id + '/add-saldo';
+            const action = isWithdraw ? 'menarik' : 'menambahkan';
+
             $.ajax({
-                url: '/tabungan/' + id + '/add-saldo',
+                url: url,
                 method: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
                     amount: amount
                 },
                 success: function(response) {
+                    if (response.error) {
+                        alert(response.message);
+                        return;
+                    }
+
                     // Update the saldo display
                     $('#saldo-' + id).text('Rp ' + response.saldo_formatted);
 
@@ -284,14 +290,15 @@
                     setTimeout(() => progressBarParent.css('opacity', '1'), 10);
 
                     input.val('');
+                    alert('Berhasil ' + action + ' saldo!');
                 },
                 error: function(xhr) {
                     console.error('Error:', xhr.responseText);
                     try {
                         const error = JSON.parse(xhr.responseText);
-                        alert(error.message || 'Gagal menambahkan saldo');
+                        alert(error.message || 'Gagal ' + action + ' saldo');
                     } catch (e) {
-                        alert('Gagal menambahkan saldo. Error: ' + xhr.status + ' ' + xhr.statusText);
+                        alert('Gagal ' + action + ' saldo. Error: ' + xhr.status + ' ' + xhr.statusText);
                     }
                 }
             });

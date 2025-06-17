@@ -28,3 +28,4 @@ Route::resource('transaksi', TransaksiController::class);
 Route::resource('dompet', DompetController::class);
 Route::resource('tabungan', TabunganController::class);
 Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');
+Route::post('/tabungan/{id}/withdraw-saldo', [TabunganController::class, 'withdrawSaldo'])->name('tabungan.withdrawSaldo');

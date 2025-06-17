@@ -80,14 +80,32 @@ class TabunganController extends Controller
 
         $tabungan = Tabungan::findOrFail($id);
 
-        // if (auth()->id() !== $tabungan->user_id) {
-        //     return response()->json([
-        //         'error' => true,
-        //         'message' => 'Unauthorized'
-        //     ], 200);
-        // }
-
         $tabungan->saldo += $request->amount;
+        $tabungan->save();
+
+        return response()->json([
+            'saldo' => $tabungan->saldo,
+            'target' => $tabungan->target,
+            'saldo_formatted' => number_format($tabungan->saldo, 2, ',', '.')
+        ], 200);
+    }
+
+    public function withdrawSaldo(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $tabungan = Tabungan::findOrFail($id);
+
+        if ($request->amount > $tabungan->saldo) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Jumlah penarikan melebihi saldo tersedia'
+            ], 400);
+        }
+
+        $tabungan->saldo -= $request->amount;
         $tabungan->save();
 
         return response()->json([
