@@ -25,4 +25,10 @@ class Kategori extends Model
     {
         return $this->hasMany(Pengeluaran::class);
     }
+
+    public function transaksi()
+    {
+        return $this->hasMany(Transaksi::class);
+    }
+    
 }
