@@ -19,15 +19,6 @@ class Dompet extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function pemasukan()
-    {
-        return $this->hasMany(Pemasukan::class);
-    }
-
-    public function pengeluaran()
-    {
-        return $this->hasMany(Pengeluaran::class);
-    }
 
     public function transaksi()
     {
