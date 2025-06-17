@@ -3,20 +3,19 @@
 @section('content')
 <div class="page-breadcrumb">
     <div class="row">
-        <div class="col-7 align-self-center">
+        <div class="col-10 align-self-center">
             <h4 class="page-title text-truncate text-dark font-weight-medium mb-1">User Management</h4>
             <div class="d-flex align-items-center">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
-                        <li class="breadcrumb-item active" aria-current="page">Home</li>
+                        <li class="breadcrumb-item" aria-current="page">Home</li>
                         <li class="breadcrumb-item active" aria-current="page">Users</li>       
                     </ol>
                 </nav>
             </div>
         </div>
-        <div class="col-5 align-self-center text-end">
+        <div class="col-2 align-self-center text-end">
             <a href="{{ route('users.create') }}" class="btn btn-primary btn-rounded" id="add-user-btn">Add User</a>
-
         </div>
     </div>
 </div>
