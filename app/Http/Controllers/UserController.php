@@ -28,20 +28,27 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        // Cek apakah request dari halaman register (tanpa role) atau dari admin (pakai role)
+        $isFromRegister = !$request->has('role');
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'required|in:admin,user',
+            'role' => $isFromRegister ? '' : 'required|in:admin,user',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'email_verified_at' => $request->has('email_verified') ? now() : null,
+            'role' => $isFromRegister ? 'user' : $request->role,
+            'email_verified_at' => now(),
         ]);
+
+        if ($isFromRegister) {
+            return redirect()->route('login')->with('success', 'Akun berhasil dibuat. Silakan login.');
+        }
 
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
@@ -73,7 +80,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
+        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }
 
     public function destroy(User $user)
