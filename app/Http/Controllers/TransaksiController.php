@@ -12,8 +12,20 @@ class TransaksiController extends Controller
 {
     public function index()
     {
-        $transaksis = Transaksi::with(['user', 'dompet', 'kategori'])->latest()->get();
-        return view('transaksi.index', compact('transaksis'));
+        // Get all transactions
+        $transaksi = Transaksi::with(['user', 'dompet', 'kategori'])
+            ->latest()
+            ->get();
+
+        // Calculate totals
+        $total_income = $transaksi->where('tipe', 'pemasukan')->sum('nominal');
+        $total_expense = $transaksi->where('tipe', 'pengeluaran')->sum('nominal');
+
+        // Format totals with number_format
+        $formatted_income = number_format($total_income, 2, ',', '.');
+        $formatted_expense = number_format($total_expense, 2, ',', '.');
+
+        return view('transaksi.index', compact('transaksi', 'formatted_income', 'formatted_expense'));
     }
 
     public function create()
@@ -26,7 +38,7 @@ class TransaksiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'dompe t_id' => 'required|exists:dompets,id',
+            'dompet_id' => 'required|exists:dompets,id',
             'kategori_id' => 'required|exists:kategori,id',
             'nominal' => 'required|numeric',
             'keterangan' => 'nullable|string',
