@@ -8,7 +8,7 @@ use App\Http\Controllers\DompetController;
 use App\Http\Controllers\TabunganController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\TabunganTransaksiController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -39,9 +39,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
 
     Route::resource('kategori', KategoriController::class)->except(['show']);
-    
+
     Route::resource('transaksi', TransaksiController::class);
     Route::resource('dompet', DompetController::class);
     Route::resource('tabungan', TabunganController::class);
     Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');
+
+    Route::get('/history-tabungan', [TabunganController::class, 'history'])->name('tabungan.history');
 });

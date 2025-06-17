@@ -22,4 +22,9 @@ class Tabungan extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function transaksi()
+    {
+        return $this->hasMany(TransaksiTabungan::class);
+    }
 }

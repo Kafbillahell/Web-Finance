@@ -142,15 +142,16 @@
                             <span class="sr-only">{{ $progress }}% Complete</span>
                         </div>
                     </div>
-                    <div class="mt-2">
-                        <div class="input-group mt-2">
-                            <input type="number" name="amount" class="form-control form-control-sm add-saldo-input" placeholder="Tambah saldo" required min="1">
-                            <button type="button" class="btn btn-success btn-sm add-saldo-btn" data-id="{{ $tabungan->id }}">Tambah</button>
-                        </div>
-                        <div class="input-group mt-2">
-                            <input type="number" name="amount" class="form-control form-control-sm add-saldo-input" placeholder="Tarik saldo" required min="1">
-                            <button type="button" class="btn btn-danger btn-sm add-saldo-btn" data-id="{{ $tabungan->id }}">Tarik</button>
-                        </div>
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#modalSaldo"
+                            data-id="{{ $tabungan->id }}" data-nama="{{ $tabungan->nama }}" data-action="add">
+                            Tambah Saldo
+                        </button>
+
+                        <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalSaldo"
+                            data-id="{{ $tabungan->id }}" data-nama="{{ $tabungan->nama }}" data-action="withdraw">
+                            Tarik Saldo
+                        </button>
                     </div>
                 </div>
 
@@ -242,15 +243,84 @@
         </nav>
     </div>
 </div>
+
+<!-- Modal Tambah Saldo -->
+<div class="modal fade" id="modalSaldo" tabindex="-1" aria-labelledby="modalSaldoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formSaldo" method="POST">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalSaldoTitle">Judul</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="tabungan_id" id="tabunganId">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Jumlah Saldo</label>
+                        <input type="number" class="form-control" name="amount" id="amount" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="dompet" class="form-label" id="labelDompet">Dari/Ke Dompet</label>
+                        <select class="form-select" name="dompet_id" id="dompet" required>
+                            @foreach($dompets as $dompet)
+                            <option value="{{ $dompet->id }}">{{ $dompet->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="submitButton" class="btn">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 @section('scripts')
 <script>
     $(document).ready(function() {
+        // Saat modal dibuka (baik tambah maupun tarik)
+        $('#modalSaldo').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const id = button.data('id');
+            const nama = button.data('nama');
+            const action = button.data('action'); // "add" atau "withdraw"
+
+            $('#tabunganId').val(id);
+
+            if (action === 'add') {
+                $('#modalSaldoTitle').text('Tambah Saldo ke ' + nama);
+                $('#formSaldo').attr('action', '/tabungan/' + id + '/add-saldo');
+                $('#submitButton').text('Tambah').removeClass('btn-danger').addClass('btn-primary');
+                $('#labelDompet').text('Dari Dompet');
+            } else {
+                $('#modalSaldoTitle').text('Tarik Saldo dari ' + nama);
+                $('#formSaldo').attr('action', '/tabungan/' + id + '/withdraw-saldo');
+                $('#submitButton').text('Tarik').removeClass('btn-primary').addClass('btn-danger');
+                $('#labelDompet').text('Ke Dompet');
+            }
+        });
+
+        // Submit form tambah/tarik saldo
+        $('#formSaldo').submit(function(e) {
+            e.preventDefault();
+            const url = $(this).attr('action');
+
+            $.post(url, $(this).serialize(), function(response) {
+                location.reload();
+            }).fail(function(xhr) {
+                alert('Gagal memproses saldo');
+            });
+        });
+
+        // Tombol kecil langsung tambah/tarik saldo
         $('.add-saldo-btn').click(function() {
             const button = $(this);
             const id = button.data('id');
             const input = button.closest('.input-group').find('.add-saldo-input');
             const amount = parseFloat(input.val());
+            const dompetId = $('#dompet').val();
 
             if (isNaN(amount) || amount <= 0) {
                 alert('Masukkan nominal yang valid');
@@ -265,8 +335,10 @@
                 url: url,
                 method: 'POST',
                 data: {
-                    _token: '{{ csrf_token() }}',
-                    amount: amount
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    amount: amount,
+                    dompet_id: dompetId
+
                 },
                 success: function(response) {
                     if (response.error) {
@@ -274,17 +346,15 @@
                         return;
                     }
 
-                    // Update the saldo display
+                    // Update saldo dan progress
                     $('#saldo-' + id).text('Rp ' + response.saldo_formatted);
-
-                    // Update the progress bar
                     const progressBar = $('[data-id="' + id + '"]').find('.progress-bar');
                     const newProgress = Math.min(100, (response.saldo / response.target) * 100);
                     progressBar.css('width', newProgress + '%');
                     progressBar.attr('aria-valuenow', newProgress);
-                    progressBar.find('.sr-only').text(newProgress + '% Complete');
+                    progressBar.find('.sr-only').text(newProgress.toFixed(0) + '% Complete');
 
-                    // Update the progress bar's parent div to trigger reflow
+                    // Reflow efek
                     const progressBarParent = progressBar.parent();
                     progressBarParent.css('opacity', '0.99');
                     setTimeout(() => progressBarParent.css('opacity', '1'), 10);

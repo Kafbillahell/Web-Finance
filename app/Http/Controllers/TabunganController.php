@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dompet;
 use App\Models\Tabungan;
+use App\Models\TransaksiTabungan;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TabunganController extends Controller
 {
@@ -23,7 +26,28 @@ class TabunganController extends Controller
         }
 
         $tabungans = $query->latest()->paginate(10);
-        return view('tabungan.index', compact('tabungans'));
+        return view('tabungan.index', [
+            'tabungans' => $tabungans,
+            'dompets' => Dompet::all()
+        ]);
+    }
+
+    public function history(Request $request)
+    {
+        $query = TransaksiTabungan::with(['tabungan', 'dompet']);
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('keterangan', 'like', "%{$search}%")
+                    ->orWhereHas('tabungan', function ($t) use ($search) {
+                        $t->where('nama', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $transaksis = $query->latest()->paginate(10);
+        return view('history-tabungan.index', compact('transaksis'));
     }
 
     public function create()
@@ -76,12 +100,23 @@ class TabunganController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:1',
+            'dompet_id' => 'required|exists:dompets,id',
         ]);
 
         $tabungan = Tabungan::findOrFail($id);
 
         $tabungan->saldo += $request->amount;
         $tabungan->save();
+
+        // Catat ke tabungan_transaksi
+        TransaksiTabungan::create([
+
+            'tabungan_id' => $tabungan->id,
+            'dompet_id' => $request->dompet_id,
+            'nominal'     => $request->amount,
+            'tipe' => TransaksiTabungan::TYPE_DEPOSIT,
+            'keterangan'  => 'Tambah saldo',
+        ]);
 
         return response()->json([
             'saldo' => $tabungan->saldo,
@@ -92,8 +127,10 @@ class TabunganController extends Controller
 
     public function withdrawSaldo(Request $request, $id)
     {
+
         $request->validate([
             'amount' => 'required|numeric|min:1',
+            'dompet_id' => 'required|exists:dompets,id'
         ]);
 
         $tabungan = Tabungan::findOrFail($id);
@@ -107,6 +144,16 @@ class TabunganController extends Controller
 
         $tabungan->saldo -= $request->amount;
         $tabungan->save();
+
+        // Catat ke tabungan_transaksi
+        TransaksiTabungan::create([
+
+            'tabungan_id' => $tabungan->id,
+            'dompet_id' => $request->dompet_id,
+            'nominal'     => $request->amount,
+            'tipe' => TransaksiTabungan::TYPE_WITHDRAWAL,
+            'keterangan'  => 'Tarik saldo'
+        ]);
 
         return response()->json([
             'saldo' => $tabungan->saldo,

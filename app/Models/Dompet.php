@@ -24,4 +24,9 @@ class Dompet extends Model
     {
         return $this->hasMany(Transaksi::class);
     }
+
+    public function history()
+    {
+        return $this->hasMany(TransaksiTabungan::class);
+    }
 }
