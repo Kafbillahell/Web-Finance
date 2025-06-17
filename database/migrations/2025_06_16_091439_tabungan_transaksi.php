@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tabungan_transaksi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tabungan_id')->constrained()->onDelete('cascade');
+            $table->foreignId('tabungan_id')->constrained('tabungan')->onDelete('cascade');
             $table->foreignId('dompet_id')->nullable()->constrained('dompets')->onDelete('cascade');
             $table->enum('tipe', ['deposit', 'withdrawal']);
             $table->decimal('nominal', 18, 2);
