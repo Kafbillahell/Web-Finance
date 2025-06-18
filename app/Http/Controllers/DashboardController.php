@@ -20,8 +20,8 @@ class DashboardController extends Controller
 
         $dompet = Dompet::where('user_id', $user->id)->get();
         $totalSaldo = $dompet->sum('saldo') ?? 0;
-        $totalPemasukan = Transaksi::where('user_id', $user->id)->where('tipe', 'pemasukan')->sum('nominal');
         $totalPengeluaran = Transaksi::where('user_id', $user->id)->where('tipe', 'pengeluaran')->sum('nominal');
+        $totalPemasukan = Transaksi::where('user_id', $user->id)->where('tipe', 'pemasukan')->sum('nominal');
         $totalTabungan = Tabungan::where('user_id', $user->id)->sum('saldo');
 
         // Calculate monthly totals
