@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dompet;
 use App\Models\Transaksi;
+use App\Models\Tabungan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,8 +17,18 @@ class DashboardController extends Controller
         $user = Auth::user();
         $dompet = Dompet::where('user_id', $user->id)->get();
         $totalSaldo = $dompet->sum('saldo');
+        $totalPemasukan = Transaksi::where('user_id', $user->id)->where('tipe', 'pemasukan')->sum('nominal');
+        $totalPengeluaran = Transaksi::where('user_id', $user->id)->where('tipe', 'pengeluaran')->sum('nominal');
+        $totalTabungan = Tabungan::where('user_id', $user->id)->sum('saldo');
+        
+        // Get recent transactions
+        $recentTransactions = Transaksi::with(['dompet', 'kategori'])
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
 
-        return view('dashboard', compact('user', 'dompet', 'totalSaldo'));
+        return view('dashboard', compact('user', 'dompet', 'totalSaldo', 'totalPemasukan', 'totalPengeluaran', 'totalTabungan', 'recentTransactions'));
     }
 
     public function store(Request $request)
