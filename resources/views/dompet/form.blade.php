@@ -36,21 +36,6 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="user_id" class="form-label">User <span class="text-danger">*</span></label>
-                                <select class="form-select @error('user_id') is-invalid @enderror" id="user_id" name="user_id" required>
-                                    <option value="">Select User</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ old('user_id', $dompet->user_id ?? '') == $user->id ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('user_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-3">
                                 <label for="saldo" class="form-label">Balance</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>

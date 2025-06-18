@@ -6,6 +6,7 @@ use App\Models\Dompet;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class DompetController extends Controller
 {
@@ -38,12 +39,15 @@ class DompetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'nullable|exists:users,id',
             'nama' => 'required|string|max:255',
             'saldo' => 'nullable|numeric',
         ]);
 
-        Dompet::create($request->only(['user_id', 'nama', 'saldo']));
+        Dompet::create([
+            'user_id' => Auth::id(),
+            'nama' => $request->nama,
+            'saldo' => $request->saldo
+        ]);
 
         return redirect()->route('dompet.index')->with('success', 'Berhasil ditambahkan');
     }

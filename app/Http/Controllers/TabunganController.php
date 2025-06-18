@@ -59,13 +59,18 @@ class TabunganController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+
             'nama'    => 'required|string|max:255',
             'saldo'   => 'required|numeric|min:0',
             'target'  => 'nullable|numeric|min:0',
         ]);
 
-        Tabungan::create($request->all());
+        Tabungan::create([
+            'user_id' => Auth::id(),
+            'nama' => $request->nama,
+            'saldo' => $request->saldo,
+            'target' => $request->target
+        ]);
 
         return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan.');
     }
@@ -118,6 +123,10 @@ class TabunganController extends Controller
             'keterangan'  => 'Tambah saldo',
         ]);
 
+        $dompet = Dompet::findOrFail($request->dompet_id);
+        $dompet->saldo -= $request->amount;
+        $dompet->save();
+
         return response()->json([
             'saldo' => $tabungan->saldo,
             'target' => $tabungan->target,
@@ -154,6 +163,10 @@ class TabunganController extends Controller
             'tipe' => TransaksiTabungan::TYPE_WITHDRAWAL,
             'keterangan'  => 'Tarik saldo'
         ]);
+
+        $dompet = Dompet::findOrFail($request->dompet_id);
+        $dompet->saldo += $request->amount;
+        $dompet->save();
 
         return response()->json([
             'saldo' => $tabungan->saldo,

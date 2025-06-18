@@ -46,7 +46,7 @@ class TransaksiController extends Controller
         ]);
 
         Transaksi::create([
-            'user_id' => 1,
+            'user_id' => Auth::id(),
             'dompet_id' => $request->dompet_id,
             'kategori_id' => $request->kategori_id,
             'nominal' => $request->nominal,
@@ -54,6 +54,18 @@ class TransaksiController extends Controller
             'tipe' => $request->tipe,
         ]);
 
+        $dompet = Dompet::findOrFail($request->dompet_id);
+        if($request->tipe == 'pengeluaran') {
+            $dompet->saldo -= $request->nominal;
+        } else {
+            $dompet->saldo += $request->nominal;
+        }
+
+        $dompet->save();
+
+        if($request->tipe == 'pengeluaran' && $dompet->saldo < $request->nominal) {
+            return back()->with('error', 'Saldo tidak mencukupi untuk transaksi ini.');
+        }
         return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil ditambahkan.');
     }
 

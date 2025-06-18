@@ -14,23 +14,6 @@
                         @endif
 
                         <div class="form-group row">
-                            <label for="user_id" class="col-sm-2 col-form-label">User</label>
-                            <div class="col-sm-10">
-                                <select name="user_id" id="user_id" class="form-control @error('user_id') is-invalid @enderror" required>
-                                    <option value="">Select User</option>
-                                    @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ isset($tabungan) && $tabungan->user_id == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                @error('user_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
                             <label for="nama" class="col-sm-2 col-form-label">Nama</label>
                             <div class="col-sm-10">
                                 <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror"

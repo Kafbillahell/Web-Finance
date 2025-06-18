@@ -242,7 +242,7 @@
                                 <div class="text-center py-4">
                                     <i class="fas fa-exchange-alt display-1 mb-3 text-muted"></i>
                                     <p class="mb-0">No recent transactions</p>
-                                </div>
+                                </div> 
                                 @else
                                 <div class="table-responsive">
                                     <table class="table table-hover">
