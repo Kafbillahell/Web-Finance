@@ -127,6 +127,10 @@ class TabunganController extends Controller
         $dompet->saldo -= $request->amount;
         $dompet->save();
 
+        if($dompet->saldo > $request->amount){
+            return back()->with('error', 'Saldo dompet anda tidak cukup.');
+        }
+
         return response()->json([
             'saldo' => $tabungan->saldo,
             'target' => $tabungan->target,
@@ -167,6 +171,7 @@ class TabunganController extends Controller
         $dompet = Dompet::findOrFail($request->dompet_id);
         $dompet->saldo += $request->amount;
         $dompet->save();
+
 
         return response()->json([
             'saldo' => $tabungan->saldo,
