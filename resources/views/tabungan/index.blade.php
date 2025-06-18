@@ -1,6 +1,9 @@
 @extends('layouts.default')
 @section('style')
 <style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
     .savings-card {
         border: none;
         border-radius: 1rem;

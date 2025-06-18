@@ -12,6 +12,7 @@ class TransaksiController extends Controller
 {
     public function index()
     {
+        // Get all transactions for the current year
         $transaksi = Transaksi::with(['user', 'dompet', 'kategori'])
             ->where('user_id', Auth::id())
             ->whereYear('created_at', now()->year)
@@ -19,13 +20,23 @@ class TransaksiController extends Controller
 
         // Calculate monthly totals
         $monthlyTotals = [];
+        $currentYear = now()->year;
+        
+        // Get all transactions for the current year
+        $allTransactions = Transaksi::where('user_id', Auth::id())
+            ->whereYear('created_at', $currentYear)
+            ->get();
+
         for ($month = 1; $month <= 12; $month++) {
-            $income = $transaksi->where('tipe', 'pemasukan')
-                ->whereMonth('created_at', $month)
+            // Filter transactions by month
+            $monthTransactions = $allTransactions->filter(function($trx) use ($month) {
+                return $trx->created_at->month === $month;
+            });
+
+            $income = $monthTransactions->where('tipe', 'pemasukan')
                 ->sum('nominal');
             
-            $expense = $transaksi->where('tipe', 'pengeluaran')
-                ->whereMonth('created_at', $month)
+            $expense = $monthTransactions->where('tipe', 'pengeluaran')
                 ->sum('nominal');
 
             $monthlyTotals[] = [
@@ -35,6 +46,7 @@ class TransaksiController extends Controller
             ];
         }
 
+        // Calculate totals for display
         $total_income = $transaksi->where('tipe', 'pemasukan')->sum('nominal');
         $total_expense = $transaksi->where('tipe', 'pengeluaran')->sum('nominal');
 

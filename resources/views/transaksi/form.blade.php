@@ -31,9 +31,9 @@
                             <select class="form-select @error('dompet_id') is-invalid @enderror" id="dompet_id" name="dompet_id" required>
                                 <option value="">Select Dompet</option>
                                 @foreach ($dompets as $dompet)
-                                    <option value="{{ $dompet->id }}" {{ old('dompet_id', $transaksi->dompet_id ?? '') === $dompet->id ? 'selected' : '' }}>
-                                        {{ $dompet->nama }}
-                                    </option>
+                                <option value="{{ $dompet->id }}" {{ old('dompet_id', $transaksi->dompet_id ?? '') === $dompet->id ? 'selected' : '' }}>
+                                    {{ $dompet->nama }}
+                                </option>
                                 @endforeach
                             </select>
                             @error('dompet_id')
@@ -46,9 +46,9 @@
                             <select class="form-select @error('kategori_id') is-invalid @enderror" id="kategori_id" name="kategori_id" required>
                                 <option value="">Select Kategori</option>
                                 @foreach ($kategoris as $kategori)
-                                    <option value="{{ $kategori->id }}" {{ old('kategori_id', $transaksi->kategori_id ?? '') === $kategori->id ? 'selected' : '' }}>
-                                        {{ $kategori->nama }}
-                                    </option>
+                                <option value="{{ $kategori->id }}" {{ old('kategori_id', $transaksi->kategori_id ?? '') === $kategori->id ? 'selected' : '' }}>
+                                    {{ $kategori->nama }}
+                                </option>
                                 @endforeach
                             </select>
                             @error('kategori_id')
