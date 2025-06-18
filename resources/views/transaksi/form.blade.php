@@ -74,21 +74,6 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="tipe" class="form-label">Tipe <span class="text-danger">*</span></label>
-                            <select class="form-select @error('tipe') is-invalid @enderror" id="tipe" name="tipe"
-                                required>
-                                <option value="">Select Tipe</option>
-                                <option value="pemasukan" {{ old('tipe', $transaksi->tipe ?? '') === 'pemasukan' ? 'selected' : '' }}>
-                                    Pemasukan</option>
-                                <option value="pengeluaran" {{ old('tipe', $transaksi->tipe ?? '') === 'pengeluaran' ? 'selected' : '' }}>
-                                    Pengeluaran</option>
-                            </select>
-                            @error('tipe')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('transaksi.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back

@@ -137,8 +137,8 @@
                                     <td>{{ $trx->kategori->nama ?? 'N/A' }}</td>
                                     <td>
                                         <span class="badge px-3 py-2 rounded-pill 
-                                                {{ $trx->tipe === 'pemasukan' ? 'bg-success text-white' : 'bg-danger text-white' }}">
-                                            {{ ucfirst($trx->tipe) }}
+                                             {{ $trx->kategori && $trx->kategori->tipe === 'pemasukan' ? 'bg-success text-white' : 'bg-danger text-white' }}">
+                                            {{ ucfirst($trx->kategori->tipe ?? '-') }}
                                         </span>
                                     </td>
                                     <td>{{ number_format($trx->nominal, 2, ',', '.') }}</td>
