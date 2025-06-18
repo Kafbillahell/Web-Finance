@@ -159,7 +159,7 @@
                     <div>Dibuat pada: {{ $tabungan->created_at->format('d M Y') }}</div>
                     <div>Created by: {{ $tabungan->user->name ?? 'Unknown' }}</div>
                 </div>
-
+ 
                 <div class="text-end">
                     <a href="{{ route('tabungan.edit', $tabungan->id) }}" class="btn btn-sm btn-outline-primary me-2">
                         <i class="fas fa-pen"></i> Edit

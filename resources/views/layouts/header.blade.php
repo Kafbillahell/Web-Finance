@@ -170,11 +170,11 @@
                         aria-haspopup="true" aria-expanded="false">
                         <img src="{{asset('assets/images/users/profile-pic.jpg')}}" alt="user" class="rounded-circle"
                             width="40">
-                       <span class="ml-2 d-none d-lg-inline-block">
-    <span>Hello,</span> 
-    <span class="text-dark">{{ Auth::user()->name }}</span> 
-    <i data-feather="chevron-down" class="svg-icon"></i>
-</span>
+                        <span class="ml-2 d-none d-lg-inline-block">
+                            <span>Hello,</span>
+                            <span class="text-dark">{{ Auth::user()->name }}</span>
+                            <i data-feather="chevron-down" class="svg-icon"></i>
+                        </span>
 
                     </a>
                     <div class="dropdown-menu dropdown-menu-right user-dd animated flipInY">
@@ -193,11 +193,11 @@
                             Account Setting</a>
                         <div class="dropdown-divider"></div>
                         <form action="{{ route('logout') }}" method="POST" id="logout-form">
-    @csrf
-    <button type="submit" class="dropdown-item">
-        <i data-feather="power" class="svg-icon mr-2 ml-1"></i> Logout
-    </button>
-</form>
+                            @csrf
+                            <button type="submit" class="dropdown-item">
+                                <i data-feather="power" class="svg-icon mr-2 ml-1"></i> Logout
+                            </button>
+                        </form>
 
                         <div class="dropdown-divider"></div>
                         <div class="pl-4 p-3"><a href="javascript:void(0)" class="btn btn-sm btn-info">View

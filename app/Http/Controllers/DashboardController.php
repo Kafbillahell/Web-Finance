@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dompet;
+use App\Models\Kategori;
 use App\Models\Transaksi;
 use App\Models\Tabungan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 // use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +22,27 @@ class DashboardController extends Controller
         $totalPemasukan = Transaksi::where('user_id', $user->id)->where('tipe', 'pemasukan')->sum('nominal');
         $totalPengeluaran = Transaksi::where('user_id', $user->id)->where('tipe', 'pengeluaran')->sum('nominal');
         $totalTabungan = Tabungan::where('user_id', $user->id)->sum('saldo');
-        
+
+        $kategoriTransaksi = \App\Models\Kategori::all();
+
+        // Loop dan hitung total nominal per kategori untuk user login
+        foreach ($kategoriTransaksi as $kategori) {
+            $total = $kategori->transaksi()
+                ->where('user_id', $user->id)
+                ->sum('nominal');
+
+            // Tambahkan properti manual untuk digunakan di view
+            $kategori->total_nominal = $total;
+        }
+
+        // Filter hanya kategori yang ada transaksinya dan urutkan dari kecil ke besar
+        $kategoriTransaksi = $kategoriTransaksi
+            ->filter(function ($item) {
+                return $item->total_nominal > 0;
+            })
+            ->sortBy('total_nominal') // 🔁 URUTKAN dari nominal terkecil
+            ->values();
+
         // Get recent transactions
         $recentTransactions = Transaksi::with(['dompet', 'kategori'])
             ->where('user_id', $user->id)
@@ -28,7 +50,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('dashboard', compact('user', 'dompet', 'totalSaldo', 'totalPemasukan', 'totalPengeluaran', 'totalTabungan', 'recentTransactions'));
+        return view('dashboard', compact('user', 'dompet', 'totalSaldo', 'totalPemasukan', 'totalPengeluaran', 'totalTabungan', 'recentTransactions', 'kategoriTransaksi'));
     }
 
     public function store(Request $request)

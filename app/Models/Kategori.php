@@ -16,12 +16,9 @@ class Kategori extends Model
         'tipe',
     ];
 
-
-
-
     public function transaksi()
     {
-        return $this->hasMany(Transaksi::class);
+        return $this->hasMany(Transaksi::class, 'kategori_id');
     }
     
 }
