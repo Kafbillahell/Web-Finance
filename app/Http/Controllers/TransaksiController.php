@@ -14,21 +14,40 @@ class TransaksiController extends Controller
     {
         $transaksi = Transaksi::with(['user', 'dompet', 'kategori'])
             ->where('user_id', Auth::id())
-            ->latest()
+            ->whereYear('created_at', now()->year)
             ->get();
+
+        // Calculate monthly totals
+        $monthlyTotals = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $income = $transaksi->where('tipe', 'pemasukan')
+                ->whereMonth('created_at', $month)
+                ->sum('nominal');
+            
+            $expense = $transaksi->where('tipe', 'pengeluaran')
+                ->whereMonth('created_at', $month)
+                ->sum('nominal');
+
+            $monthlyTotals[] = [
+                'month' => date('M', mktime(0, 0, 0, $month, 10)),
+                'income' => $income,
+                'expense' => $expense
+            ];
+        }
+
         $total_income = $transaksi->where('tipe', 'pemasukan')->sum('nominal');
         $total_expense = $transaksi->where('tipe', 'pengeluaran')->sum('nominal');
 
         $formatted_income = number_format($total_income, 2, ',', '.');
         $formatted_expense = number_format($total_expense, 2, ',', '.');
 
-        return view('transaksi.index', compact('transaksi', 'formatted_income', 'formatted_expense'));
+        return view('transaksi.index', compact('transaksi', 'formatted_income', 'formatted_expense', 'monthlyTotals'));
     }
 
     public function create()
     {
         $dompets = Auth::user()->dompets;
-        $kategoris = Kategori::all();
+        $kategoris = Kategori::where('id_user', Auth::id())->get();
         return view('transaksi.form', compact('dompets', 'kategoris'));
     }
 

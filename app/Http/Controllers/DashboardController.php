@@ -24,6 +24,28 @@ class DashboardController extends Controller
         $totalPengeluaran = Transaksi::where('user_id', $user->id)->where('tipe', 'pengeluaran')->sum('nominal');
         $totalTabungan = Tabungan::where('user_id', $user->id)->sum('saldo');
 
+        // Calculate monthly totals
+        $monthlyTotals = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $income = Transaksi::where('user_id', $user->id)
+                ->where('tipe', 'pemasukan')
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', $month)
+                ->sum('nominal');
+            
+            $expense = Transaksi::where('user_id', $user->id)
+                ->where('tipe', 'pengeluaran')
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', $month)
+                ->sum('nominal');
+
+            $monthlyTotals[] = [
+                'month' => date('M', mktime(0, 0, 0, $month, 10)),
+                'income' => $income,
+                'expense' => $expense
+            ];
+        }
+
         $kategoriTransaksi = \App\Models\Kategori::all();
 
         // Loop dan hitung total nominal per kategori untuk user login
@@ -51,7 +73,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('dashboard', compact('user', 'dompet', 'totalSaldo', 'totalPemasukan', 'totalPengeluaran', 'totalTabungan', 'recentTransactions', 'kategoriTransaksi'));
+        return view('dashboard', compact('user', 'dompet', 'totalSaldo', 'totalPemasukan', 'totalPengeluaran', 'totalTabungan', 'recentTransactions', 'kategoriTransaksi', 'monthlyTotals'));
     }
 
     public function store(Request $request)
@@ -87,8 +109,8 @@ class DashboardController extends Controller
 
         // Cari atau buat kategori otomatis
         $kategori = Kategori::firstOrCreate(
-            ['nama' => ucfirst($tipe)],
-            ['tipe' => $tipeTransaksi]
+            ['nama' => ucfirst($tipe), 'id_user' => $user->id],
+            ['tipe' => $tipeTransaksi, 'id_user' => $user->id]
         );
 
         Transaksi::create([

@@ -28,6 +28,10 @@
     </div>
 </div>
 
+<script>
+    window.monthlyData = @json($monthlyTotals);
+</script>
+
 <div class="container-fluid">
     <div class="card-group">
         @foreach(['Saldo' => $totalSaldo, 'Tabungan' => $totalTabungan, 'Pemasukan' => $totalPemasukan, 'Pengeluaran' => $totalPengeluaran] as $label => $value)
