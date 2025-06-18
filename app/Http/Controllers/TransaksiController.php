@@ -47,13 +47,18 @@ class TransaksiController extends Controller
         }
 
         // Calculate totals for display
-        $total_income = $transaksi->where('tipe', 'pemasukan')->sum('nominal');
-        $total_expense = $transaksi->where('tipe', 'pengeluaran')->sum('nominal');
+
+        $total_income = $transaksi->filter(function ($item) {
+            return $item->kategori && $item->kategori->tipe === 'pemasukan';
+        })->sum('nominal');
+
+        $total_expense = $transaksi->filter(function ($item) {
+            return $item->kategori && $item->kategori->tipe === 'pengeluaran';
+        })->sum('nominal');
 
         $formatted_income = number_format($total_income, 2, ',', '.');
         $formatted_expense = number_format($total_expense, 2, ',', '.');
-
-        return view('transaksi.index', compact('transaksi', 'formatted_income', 'formatted_expense', 'monthlyTotals'));
+        return view('transaksi.index', compact('transaksi', 'formatted_income', 'formatted_expense'));
     }
 
     public function create()
@@ -70,30 +75,31 @@ class TransaksiController extends Controller
             'kategori_id' => 'required|exists:kategori,id',
             'nominal' => 'required|numeric',
             'keterangan' => 'nullable|string',
-            'tipe' => 'required|in:pemasukan,pengeluaran',
         ]);
 
-        Transaksi::create([
+        $kategori = Kategori::findOrFail($request->kategori_id);
+        $tipe = $kategori->tipe;
+
+        $transaksi = Transaksi::create([
             'user_id' => Auth::id(),
             'dompet_id' => $request->dompet_id,
             'kategori_id' => $request->kategori_id,
             'nominal' => $request->nominal,
             'keterangan' => $request->keterangan,
-            'tipe' => $request->tipe,
         ]);
 
         $dompet = Dompet::findOrFail($request->dompet_id);
-        if($request->tipe == 'pengeluaran') {
+
+        if ($tipe === 'pengeluaran') {
+            if ($dompet->saldo < $request->nominal) {
+                return back()->with('error', 'Saldo tidak mencukupi untuk transaksi ini.');
+            }
             $dompet->saldo -= $request->nominal;
         } else {
             $dompet->saldo += $request->nominal;
         }
 
         $dompet->save();
-
-        if($request->tipe == 'pengeluaran' && $dompet->saldo < $request->nominal) {
-            return back()->with('error', 'Saldo tidak mencukupi untuk transaksi ini.');
-        }
         return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil ditambahkan.');
     }
 
@@ -114,7 +120,6 @@ class TransaksiController extends Controller
             'kategori_id' => 'required|exists:kategori,id',
             'nominal' => 'required|numeric',
             'keterangan' => 'nullable|string',
-            'tipe' => 'required|in:pemasukan,pengeluaran',
         ]);
 
         $transaksi->update([
@@ -122,7 +127,6 @@ class TransaksiController extends Controller
             'kategori_id' => $request->kategori_id,
             'nominal' => $request->nominal,
             'keterangan' => $request->keterangan,
-            'tipe' => $request->tipe,
         ]);
 
         return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diupdate.');

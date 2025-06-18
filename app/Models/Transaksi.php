@@ -8,7 +8,7 @@ class Transaksi extends Model
 {
     //
     protected $table = 'transaksi';
-    protected $fillable = ['user_id', 'dompet_id', 'kategori_id', 'nominal', 'keterangan', 'tipe'];
+    protected $fillable = ['user_id', 'dompet_id', 'kategori_id', 'nominal', 'keterangan'];
 
     public function user()
     {
@@ -19,7 +19,7 @@ class Transaksi extends Model
     {
         return $this->belongsTo(Dompet::class);
     }
-
+ 
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);
