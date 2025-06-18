@@ -12,10 +12,41 @@ class TransaksiController extends Controller
 {
     public function index()
     {
+        // Get all transactions for the current year
         $transaksi = Transaksi::with(['user', 'dompet', 'kategori'])
             ->where('user_id', Auth::id())
-            ->latest()
+            ->whereYear('created_at', now()->year)
             ->get();
+
+        // Calculate monthly totals
+        $monthlyTotals = [];
+        $currentYear = now()->year;
+        
+        // Get all transactions for the current year
+        $allTransactions = Transaksi::where('user_id', Auth::id())
+            ->whereYear('created_at', $currentYear)
+            ->get();
+
+        for ($month = 1; $month <= 12; $month++) {
+            // Filter transactions by month
+            $monthTransactions = $allTransactions->filter(function($trx) use ($month) {
+                return $trx->created_at->month === $month;
+            });
+
+            $income = $monthTransactions->where('tipe', 'pemasukan')
+                ->sum('nominal');
+            
+            $expense = $monthTransactions->where('tipe', 'pengeluaran')
+                ->sum('nominal');
+
+            $monthlyTotals[] = [
+                'month' => date('M', mktime(0, 0, 0, $month, 10)),
+                'income' => $income,
+                'expense' => $expense
+            ];
+        }
+
+        // Calculate totals for display
 
         $total_income = $transaksi->filter(function ($item) {
             return $item->kategori && $item->kategori->tipe === 'pemasukan';
@@ -33,7 +64,7 @@ class TransaksiController extends Controller
     public function create()
     {
         $dompets = Auth::user()->dompets;
-        $kategoris = Kategori::all();
+        $kategoris = Kategori::where('id_user', Auth::id())->get();
         return view('transaksi.form', compact('dompets', 'kategoris'));
     }
 

@@ -1,6 +1,7 @@
 @extends('layouts.default')
 
 @section('style')
+@if(Auth::user()->role == 'user')
 <link href="{{ asset('assets/extra-libs/c3/c3.min.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/libs/chartist/dist/chartist.min.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/extra-libs/jvector/jquery-jvectormap-2.0.2.css') }}" rel="stylesheet" />
@@ -27,6 +28,10 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.monthlyData = @json($monthlyTotals);
+</script>
 
 <div class="container-fluid">
     <div class="card-group">
@@ -107,7 +112,6 @@
     </div>
     @endforeach
 
-
     <div class="row">
         <div class="col-lg-4 col-md-12">
             <div class="card">
@@ -180,12 +184,12 @@
                                     <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
                                     <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
                                     <td>
-                                        <span class="badge bg-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                            {{ ucfirst($transaction->tipe) }}
+                                        <span class="badge bg-{{ $transaction->kategori->tipe   === 'pemasukan' ? 'success' : 'danger' }}">
+                                            {{ ucfirst($transaction->kategori->tipe) }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
+                                        <span class="fw-bold text-{{ $transaction->kategori->tipe === 'pemasukan' ? 'success' : 'danger' }}">
                                             Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
                                         </span>
                                     </td>
@@ -210,6 +214,7 @@
     </div>
     @endif
 </div>
+@endif
 @endsection
 
 @section('scripts')

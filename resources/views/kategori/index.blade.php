@@ -43,6 +43,7 @@
                                     <th>#</th>
                                     <th>Nama Kategori</th>
                                     <th>Tipe Kategori</th>
+                                    <th>Id User</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -57,6 +58,7 @@
                                             {{ ucfirst($row->tipe) }}
                                         </span>
                                     </td>
+                                    <td>{{ $row->user->name ?? 'Unknown' }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ url("kategori/$row->id/edit") }}" class="btn btn-warning btn-sm">
@@ -74,7 +76,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">Belum ada data kategori.</td>
+                                    <td colspan="5" class="text-center">Belum ada data kategori.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
