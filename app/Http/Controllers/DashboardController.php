@@ -17,8 +17,9 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+
         $dompet = Dompet::where('user_id', $user->id)->get();
-        $totalSaldo = $dompet->sum('saldo');
+        $totalSaldo = $dompet->sum('saldo') ?? 0;
         $totalPemasukan = Transaksi::where('user_id', $user->id)->where('tipe', 'pemasukan')->sum('nominal');
         $totalPengeluaran = Transaksi::where('user_id', $user->id)->where('tipe', 'pengeluaran')->sum('nominal');
         $totalTabungan = Tabungan::where('user_id', $user->id)->sum('saldo');
@@ -61,30 +62,44 @@ class DashboardController extends Controller
             'tipe' => 'required|in:deposit,withdraw',
         ]);
 
-        Transaksi::create([
-            'user_id' => Auth::id(),
-            'dompet_id' => $request->dompet_id,
-            'kategori_id' => null, // Bisa null kalau tidak ada kategori
-            'nominal' => $request->amount,
-            'keterangan' => ucfirst($request->tipe) . ' saldo melalui dashboard',
-            'tipe' => $request->tipe === 'deposit' ? 'pemasukan' : 'pengeluaran',
-        ]);
+        $user = Auth::user();
 
         $dompet = Dompet::where('id', $request->dompet_id)
-            ->where('user_id', Auth::id())
+            ->where('user_id', $user->id)
             ->firstOrFail();
 
-        if ($request->tipe === 'withdraw') {
-            if ($dompet->saldo < $request->amount) {
-                return redirect()->route('dashboard')->with('error', 'Saldo tidak mencukupi.');
+        $amount = $request->amount;
+        $tipe = $request->tipe;
+        $tipeTransaksi = $tipe === 'withdraw' ? 'pengeluaran' : 'pemasukan';
+
+        $saldoSekarang = $dompet->saldo ?? 0;
+
+        if ($tipe === 'withdraw') {
+            if ($saldoSekarang < $amount) {
+                return redirect()->route('dashboard')->with('error', 'Saldo tidak mencukupi untuk withdraw.');
             }
-            $dompet->saldo -= $request->amount;
+            $saldoBaru = $saldoSekarang - $amount;
         } else {
-            $dompet->saldo += $request->amount;
+            $saldoBaru = $saldoSekarang + $amount;
         }
 
-        $dompet->save();
+        $dompet->update(['saldo' => $saldoBaru]);
 
-        return redirect()->route('dashboard')->with('success', ucfirst($request->tipe) . ' berhasil.');
+        // Cari atau buat kategori otomatis
+        $kategori = Kategori::firstOrCreate(
+            ['nama' => ucfirst($tipe)],
+            ['tipe' => $tipeTransaksi]
+        );
+
+        Transaksi::create([
+            'user_id' => $user->id,
+            'dompet_id' => $dompet->id,
+            'kategori_id' => $kategori->id,
+            'nominal' => $amount,
+            'keterangan' => ucfirst($tipe) . ' saldo melalui dashboard',
+            'tipe' => $tipeTransaksi,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', ucfirst($tipe) . ' saldo berhasil.');
     }
 }
