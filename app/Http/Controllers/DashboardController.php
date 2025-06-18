@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dompet;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+// use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $dompet = Dompet::where('user_id', $user->id)->get();
         $totalSaldo = $dompet->sum('saldo');
 
@@ -24,9 +28,18 @@ class DashboardController extends Controller
             'tipe' => 'required|in:deposit,withdraw',
         ]);
 
+        Transaksi::create([
+            'user_id' => Auth::id(),
+            'dompet_id' => $request->dompet_id,
+            'kategori_id' => null, // Bisa null kalau tidak ada kategori
+            'nominal' => $request->amount,
+            'keterangan' => ucfirst($request->tipe) . ' saldo melalui dashboard',
+            'tipe' => $request->tipe === 'deposit' ? 'pemasukan' : 'pengeluaran',
+        ]);
+
         $dompet = Dompet::where('id', $request->dompet_id)
-                        ->where('user_id', auth()->id())
-                        ->firstOrFail();
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
         if ($request->tipe === 'withdraw') {
             if ($dompet->saldo < $request->amount) {
