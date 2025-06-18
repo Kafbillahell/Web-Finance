@@ -45,7 +45,8 @@
         @endforeach
     </div>
 
-    <div class="card p-4 mb-4 d-flex flex-row justify-content-between align-items-center shadow-sm rounded-3">
+
+    <div class="card p-4 mb-4 d-flex justify-content-between align-items-center shadow-sm rounded-3">
         <div class="d-flex align-items-center">
             <div class="bg-light-success text-success rounded-circle p-3 me-3">
                 <i class="fas fa-wallet fa-2x"></i>
@@ -60,8 +61,8 @@
                 <i class="fas fa-plus me-2"></i> Deposit
             </button>
             @if($dompet->isNotEmpty())
-            <button class="btn btn-outline-danger px-4" data-bs-toggle="modal" data-bs-target="#withdrawModal">
-                <i class="fas fa-minus me-2"></i> Withdraw
+            <button class="btn btn-outline-success px-4" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                <i class="fas fa-paper-plane me-2"></i> Withdraw
             </button>
             @endif
             <a href="{{ route('dompet.index') }}" class="btn btn-success px-4">
@@ -70,41 +71,44 @@
         </div>
     </div>
 
-    @foreach(['deposit', 'withdraw'] as $type)
+
+    <!-- Modals -->
+    @foreach(['deposit' => 'Deposit Saldo', 'withdraw' => 'Withdraw Saldo'] as $type => $title)
     <div class="modal fade" id="{{ $type }}Modal" tabindex="-1" aria-labelledby="{{ $type }}ModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
-            <form id="{{ $type }}Form" method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
+            <form method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
                 @csrf
                 <input type="hidden" name="tipe" value="{{ $type }}">
-                <div class="modal-header bg-{{ $type == 'deposit' ? 'success' : 'danger' }} text-white">
-                    <h5 class="modal-title" id="{{ $type }}ModalLabel">
-                        <i class="fas fa-{{ $type == 'deposit' ? 'plus' : 'minus' }} me-2"></i> {{ ucfirst($type) }} Saldo
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="{{ $type }}ModalLabel"><i class="fas fa-{{ $type=='deposit'? 'plus':'paper-plane' }} me-2"></i> {{ $title }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="{{ $type }}Amount" class="form-label">Jumlah {{ ucfirst($type) }}</label>
-                        <input type="number" name="amount" id="{{ $type }}Amount" class="form-control" min="1" placeholder="Misal: 50000" required>
+                        <input type="number" name="amount" id="{{ $type }}Amount" class="form-control" min="1" step="0.01" placeholder="Misal: 50000" required>
                     </div>
                     <div class="mb-3">
                         <label for="dompet_id_{{ $type }}" class="form-label">Pilih Dompet</label>
                         <select id="dompet_id_{{ $type }}" name="dompet_id" class="form-select" required>
-                            <option value="" selected disabled>-- Pilih Dompet --</option>
                             @foreach($dompet as $item)
-                            <option value="{{ $item->id }}" data-saldo="{{ $item->saldo }}">{{ $item->nama }} (Rp{{ number_format($item->saldo,0,',','.') }})</option>
+                            <option value="{{ $item->id }}">{{ $item->nama }} (Rp{{ number_format($item->saldo,0,',','.') }})</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-{{ $type == 'deposit' ? 'success' : 'danger' }}">{{ ucfirst($type) }}</button>
+                    <button type="submit" class="btn {{ $type == 'deposit' ? 'btn-success' : 'btn-outline-success' }} w-100">
+                        <i class="fas fa-check-circle me-2"></i> Konfirmasi
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-    @endforeach <div class="row">
+    @endforeach
+
+
+    <div class="row">
         <div class="col-lg-4 col-md-12">
             <div class="card">
                 <div class="card-body">
