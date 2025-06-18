@@ -31,9 +31,9 @@
                             <select class="form-select @error('dompet_id') is-invalid @enderror" id="dompet_id" name="dompet_id" required>
                                 <option value="">Select Dompet</option>
                                 @foreach ($dompets as $dompet)
-                                    <option value="{{ $dompet->id }}" {{ old('dompet_id', $transaksi->dompet_id ?? '') === $dompet->id ? 'selected' : '' }}>
-                                        {{ $dompet->nama }}
-                                    </option>
+                                <option value="{{ $dompet->id }}" {{ old('dompet_id', $transaksi->dompet_id ?? '') === $dompet->id ? 'selected' : '' }}>
+                                    {{ $dompet->nama }}
+                                </option>
                                 @endforeach
                             </select>
                             @error('dompet_id')
@@ -46,9 +46,9 @@
                             <select class="form-select @error('kategori_id') is-invalid @enderror" id="kategori_id" name="kategori_id" required>
                                 <option value="">Select Kategori</option>
                                 @foreach ($kategoris as $kategori)
-                                    <option value="{{ $kategori->id }}" {{ old('kategori_id', $transaksi->kategori_id ?? '') === $kategori->id ? 'selected' : '' }}>
-                                        {{ $kategori->nama }}
-                                    </option>
+                                <option value="{{ $kategori->id }}" {{ old('kategori_id', $transaksi->kategori_id ?? '') === $kategori->id ? 'selected' : '' }}>
+                                    {{ $kategori->nama }}
+                                </option>
                                 @endforeach
                             </select>
                             @error('kategori_id')
@@ -70,21 +70,6 @@
                             <input type="text" class="form-control @error('keterangan') is-invalid @enderror" id="keterangan"
                                 name="keterangan" value="{{ old('keterangan', $transaksi->keterangan ?? '') }}" required>
                             @error('keterangan')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="tipe" class="form-label">Tipe <span class="text-danger">*</span></label>
-                            <select class="form-select @error('tipe') is-invalid @enderror" id="tipe" name="tipe"
-                                required>
-                                <option value="">Select Tipe</option>
-                                <option value="pemasukan" {{ old('tipe', $transaksi->tipe ?? '') === 'pemasukan' ? 'selected' : '' }}>
-                                    Pemasukan</option>
-                                <option value="pengeluaran" {{ old('tipe', $transaksi->tipe ?? '') === 'pengeluaran' ? 'selected' : '' }}>
-                                    Pengeluaran</option>
-                            </select>
-                            @error('tipe')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
