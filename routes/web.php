@@ -46,8 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard', [DashboardController::class, 'store'])->name('dashboard.store');
 
     // Dompet fitur tambahan (deposit & withdraw)
-   Route::post('/dompet/{id}/deposit', [DompetController::class, 'deposit'])->name('dompet.deposit');
-Route::post('/dompet/{id}/withdraw', [DompetController::class, 'withdraw'])->name('dompet.withdraw');
-Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
-
+    Route::post('/dompet/{id}/deposit', [DompetController::class, 'deposit'])->name('dompet.deposit');
+    Route::post('/dompet/{id}/withdraw', [DompetController::class, 'withdraw'])->name('dompet.withdraw');
+    Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
 });

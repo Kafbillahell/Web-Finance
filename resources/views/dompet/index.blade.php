@@ -215,7 +215,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="stats-card">
-                            <div class="stats-number text-success">Rp {{ $total_saldo ?? '0' }}</div>
+                            <div class="stats-number text-success">Rp {{ number_format($total_saldo ?? 0, 0, ',', '.') }}</div>
                             <div class="stats-label">Total Balance</div>
                         </div>
                     </div>
