@@ -32,21 +32,27 @@
 
     {{-- Saldo --}}
     <div class="card p-4 mb-4 d-flex flex-row justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <div class="bg-light-success text-success rounded-circle p-3 me-3">
-                <i class="fas fa-dollar-sign fa-2x"></i>
-            </div>
-            <div>
-                <div class="text-muted small">Dompet-KU</div>
-                <h5 class="mb-0">Rp{{ number_format($totalSaldo, 0, ',', '.') }}</h5>
-            </div>
+    <div class="d-flex align-items-center">
+        <div class="bg-light-success text-success rounded-circle p-3 me-3">
+            <i class="fas fa-dollar-sign fa-2x"></i>
         </div>
+        <div>
+            <div class="text-muted small">Dompet-KU</div>
+            <h5 class="mb-0">Rp{{ number_format($totalSaldo, 0, ',', '.') }}</h5>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
         @if($dompet->isNotEmpty())
         <button class="btn btn-outline-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#withdrawModal">
             <i class="fas fa-paper-plane me-2"></i> Withdraw
         </button>
         @endif
+        <a href="{{ route('dompet.index') }}" class="btn btn-success d-flex align-items-center">
+            <i class="fas fa-wallet me-2"></i> More Detail
+        </a>
     </div>
+</div>
+
 
   {{-- Modal Deposit --}}
 <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
