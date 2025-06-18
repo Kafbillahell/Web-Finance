@@ -91,130 +91,56 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-4 col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Total Sales</h4>
-                    <div id="campaign-v2" class="mt-2" style="height:283px; width:100%;"></div>
-                    <ul class="list-style-none mb-0">
-                        <li>
-                            <i class="fas fa-circle text-primary font-10 mr-2"></i>
-                            <span class="text-muted">Direct Sales</span>
-                            <span class="text-dark float-right font-weight-medium">$2346</span>
-                        </li>
-                        <li class="mt-3">
-                            <i class="fas fa-circle text-danger font-10 mr-2"></i>
-                            <span class="text-muted">Referral Sales</span>
-                            <span class="text-dark float-right font-weight-medium">$2108</span>
-                        </li>
-                        <li class="mt-3">
-                            <i class="fas fa-circle text-cyan font-10 mr-2"></i>
-                            <span class="text-muted">Affiliate Sales</span>
-                            <span class="text-dark float-right font-weight-medium">$1204</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Bar Chart</h4>
-                    <div id="morris-bar-chart"></div>
-                </div>
-            </div>
-        </div>
+    @endif
 
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">Recent Transactions</h4>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <a href="{{ route('transaksi.index') }}" class="btn btn-primary btn-sm me-2">
-                                View All Transactions
-                            </a>
-                            <a href="#" class="btn btn-primary btn-sm">
-                                Export Transactions
-                            </a>
-                        </div>
+    {{-- Saldo --}}
+    <div class="card p-4 mb-4 d-flex flex-row justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <div class="bg-light-success text-success rounded-circle p-3 me-3">
+                <i class="fas fa-dollar-sign fa-2x"></i>
+            </div>
+            <div>
+                <div class="text-muted small">Dompet-KU</div>
+                <h5 class="mb-0">Rp{{ number_format($totalSaldo, 0, ',', '.') }}</h5>
+            </div>
+        </div>
+        @if($dompet->isNotEmpty())
+        <button class="btn btn-outline-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+            <i class="fas fa-paper-plane me-2"></i> Withdraw
+        </button>
+        @endif
+    </div>
 
-                        @if($recentTransactions->isEmpty())
-                        <div class="text-center py-4">
-                            <i class="fas fa-exchange-alt display-1 mb-3 text-muted"></i>
-                            <p class="mb-0">No recent transactions</p>
-                        </div>
-                        @else
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Dompet</th>
-                                        <th>Kategori</th>
-                                        <th>Tipe</th>
-                                        <th>Nominal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentTransactions as $transaction)
-                                    <tr>
-                                        <td>{{ $transaction->created_at->format('d/m/Y H:i') }}</td>
-                                        <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
-                                        <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                                {{ ucfirst($transaction->tipe) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold text-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                                Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        @endif
-                    </div>
+  {{-- Modal Deposit --}}
+<div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="depositForm" method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
+            @csrf
+            <input type="hidden" name="tipe" value="deposit">
+            <div class="modal-header">
+                <h5 class="modal-title" id="depositModalLabel">Deposit Saldo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="depositAmount" class="form-label">Jumlah Deposit</label>
+                    <input type="number" name="amount" class="form-control" id="depositAmount" min="1" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                    <label for="dompet_id_deposit" class="form-label">Pilih Dompet</label>
+                    <select id="dompet_id_deposit" name="dompet_id" class="form-control" required>
+                        @foreach($dompet as $item)
+                            <option value="{{ $item->id }}" data-saldo="{{ $item->saldo }}">{{ $item->nama }} (Rp{{ number_format($item->saldo, 0, ',', '.') }})</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
-        </div>
-        {{-- Modal Deposit --}}
-        <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <form id="depositForm" method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
-                    @csrf
-                    <input type="hidden" name="tipe" value="deposit">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="depositModalLabel">Deposit Saldo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="depositAmount" class="form-label">Jumlah Deposit</label>
-                            <input type="number" name="amount" class="form-control" id="depositAmount" min="1" step="0.01" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="dompet_id_deposit" class="form-label">Pilih Dompet</label>
-                            <select id="dompet_id_deposit" name="dompet_id" class="form-control" required>
-                                @foreach($dompet as $item)
-                                <option value="{{ $item->id }}" data-saldo="{{ $item->saldo }}">{{ $item->nama }} (Rp{{ number_format($item->saldo, 0, ',', '.') }})</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Deposit</button>
-                    </div>
-                </form>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Deposit</button>
             </div>
-        </div>
+        </form>
+    </div>
+</div>
 
         {{-- Modal Withdraw --}}
         <div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
