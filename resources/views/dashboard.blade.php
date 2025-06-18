@@ -1,7 +1,5 @@
 @extends('layouts.default')
 
-
-
 @section('style')
 @if(Auth::user()->role == 'user')
 <link href="{{ asset('assets/extra-libs/c3/c3.min.css') }}" rel="stylesheet">
@@ -114,7 +112,6 @@
     </div>
     @endforeach
 
-
     <div class="row">
         <div class="col-lg-4 col-md-12">
             <div class="card">
@@ -187,12 +184,12 @@
                                     <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
                                     <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
                                     <td>
-                                        <span class="badge bg-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                            {{ ucfirst($transaction->tipe) }}
+                                        <span class="badge bg-{{ $transaction->kategori->tipe   === 'pemasukan' ? 'success' : 'danger' }}">
+                                            {{ ucfirst($transaction->kategori->tipe) }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="fw-bold text-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
+                                        <span class="fw-bold text-{{ $transaction->kategori->tipe === 'pemasukan' ? 'success' : 'danger' }}">
                                             Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
                                         </span>
                                     </td>
