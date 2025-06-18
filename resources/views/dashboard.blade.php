@@ -29,7 +29,6 @@
 </div>
 
 <div class="container-fluid">
-    <!-- Summary Cards -->
     <div class="card-group">
         @foreach(['Saldo' => $totalSaldo, 'Tabungan' => $totalTabungan, 'Pemasukan' => $totalPemasukan, 'Pengeluaran' => $totalPengeluaran] as $label => $value)
         <div class="card border-right">
@@ -46,8 +45,7 @@
         @endforeach
     </div>
 
-    <!-- Wallet Summary + Actions -->
-    <div class="card p-4 mb-4 d-flex justify-content-between align-items-center shadow-sm rounded-3">
+    <div class="card p-4 mb-4 d-flex flex-row justify-content-between align-items-center shadow-sm rounded-3">
         <div class="d-flex align-items-center">
             <div class="bg-light-success text-success rounded-circle p-3 me-3">
                 <i class="fas fa-wallet fa-2x"></i>
@@ -62,8 +60,8 @@
                 <i class="fas fa-plus me-2"></i> Deposit
             </button>
             @if($dompet->isNotEmpty())
-            <button class="btn btn-outline-success px-4" data-bs-toggle="modal" data-bs-target="#withdrawModal">
-                <i class="fas fa-paper-plane me-2"></i> Withdraw
+            <button class="btn btn-outline-danger px-4" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                <i class="fas fa-minus me-2"></i> Withdraw
             </button>
             @endif
             <a href="{{ route('dompet.index') }}" class="btn btn-success px-4">
@@ -72,304 +70,246 @@
         </div>
     </div>
 
-    <!-- Modals -->
-    @foreach(['deposit' => 'Deposit Saldo', 'withdraw' => 'Withdraw Saldo'] as $type => $title)
+    @foreach(['deposit', 'withdraw'] as $type)
     <div class="modal fade" id="{{ $type }}Modal" tabindex="-1" aria-labelledby="{{ $type }}ModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
-            <form method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
+            <form id="{{ $type }}Form" method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
                 @csrf
                 <input type="hidden" name="tipe" value="{{ $type }}">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="{{ $type }}ModalLabel"><i class="fas fa-{{ $type=='deposit'? 'plus':'paper-plane' }} me-2"></i> {{ $title }}</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-{{ $type == 'deposit' ? 'success' : 'danger' }} text-white">
+                    <h5 class="modal-title" id="{{ $type }}ModalLabel">
+                        <i class="fas fa-{{ $type == 'deposit' ? 'plus' : 'minus' }} me-2"></i> {{ ucfirst($type) }} Saldo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="{{ $type }}Amount" class="form-label">Jumlah {{ ucfirst($type) }}</label>
-                        <input type="number" name="amount" id="{{ $type }}Amount" class="form-control" min="1" step="0.01" placeholder="Misal: 50000" required>
+                        <input type="number" name="amount" id="{{ $type }}Amount" class="form-control" min="1" placeholder="Misal: 50000" required>
                     </div>
                     <div class="mb-3">
                         <label for="dompet_id_{{ $type }}" class="form-label">Pilih Dompet</label>
                         <select id="dompet_id_{{ $type }}" name="dompet_id" class="form-select" required>
+                            <option value="" selected disabled>-- Pilih Dompet --</option>
                             @foreach($dompet as $item)
-                            <option value="{{ $item->id }}">{{ $item->nama }} (Rp{{ number_format($item->saldo,0,',','.') }})</option>
+                            <option value="{{ $item->id }}" data-saldo="{{ $item->saldo }}">{{ $item->nama }} (Rp{{ number_format($item->saldo,0,',','.') }})</option>
                             @endforeach
                         </select>
-                        
-                        <div id="kategori-data" data-json='@json($kategoriTransaksi)'></div>
-                        <div class="row">
-                            <div class="col-lg-4 col-md-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Total Kategori</h4>
-                                        <div id="campaign-v2" class="mt-2" ste="height:283px; width:100%;"></div>
-                                        <ul class="list-style-none mb-0">
-                                            @php
-                                            $chartColors = ['#edf2f6', '#5f76e8', '#ff4f70', '#01caf1', '#ffc107', '#4caf50'];
-                                            @endphp
-                                            @foreach($kategoriTransaksi as $index => $row)
-                                            <li>
-                                                <i class="fas fa-circle font-10 mr-2" style="color: {{ $chartColors[$index % count($chartColors)] }}"></i>
-                                                <span class="text-muted">{{ $row->nama }}</span>
-                                                <span class="text-dark float-right font-weight-medium">Rp {{ number_format($row->total_nominal, 0, ',', '.') }}</span>
-                                            </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Bar Chart</h4>
-                                        <div id="morris-bar-chart"></div>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-{{ $type == 'deposit' ? 'success' : 'danger' }}">{{ ucfirst($type) }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endforeach <div class="row">
+        <div class="col-lg-4 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Total Kategori</h4>
+                    <div id="kategori-data" data-json='@json($kategoriTransaksi)'></div>
+                    <div id="campaign-v2" class="mt-2" style="height:283px; width:100%;"></div>
+                    <ul class="list-style-none mb-0">
+                        @php
+                        $chartColors = ['#5f76e8', '#ff4f70', '#01caf1', '#ffc107', '#4caf50', '#edf2f6'];
+                        @endphp
+                        @foreach($kategoriTransaksi as $index => $row)
+                        <li>
+                            <i class="fas fa-circle font-10 mr-2" style="color: {{ $chartColors[$index % count($chartColors)] }}"></i>
+                            <span class="text-muted">{{ $row->nama }}</span>
+                            <span class="text-dark float-right font-weight-medium">Rp {{ number_format($row->total_nominal, 0, ',', '.') }}</span>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Bar Chart</h4>
+                    <div id="morris-bar-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                            <div class="row mt-4">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h4 class="card-title mb-0">Recent Transactions</h4>
-                                            </div>
-                                            <div class="d-flex justify-content-end">
-                                                <a href="{{ route('transaksi.index') }}" class="btn btn-primary btn-sm me-2">
-                                                    View All Transactions
-                                                </a>
-                                                <a href="#" class="btn btn-primary btn-sm">
-                                                    Export Transactions
-                                                </a>
-                                            </div>
-
-                                            @if($recentTransactions->isEmpty())
-                                            <div class="text-center py-4">
-                                                <i class="fas fa-exchange-alt display-1 mb-3 text-muted"></i>
-                                                <p class="mb-0">No recent transactions</p>
-                                            </div>
-                                            @else
-                                            <div class="table-responsive">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Tanggal</th>
-                                                            <th>Dompet</th>
-                                                            <th>Kategori</th>
-                                                            <th>Tipe</th>
-                                                            <th>Nominal</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($recentTransactions as $transaction)
-                                                        <tr>
-                                                            <td>{{ $transaction->created_at->format('d/m/Y H:i') }}</td>
-                                                            <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
-                                                            <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
-                                                            <td>
-                                                                <span class="badge bg-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                                                    {{ ucfirst($transaction->tipe) }}
-                                                                </span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="fw-bold text-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                                                    Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Modal Deposit --}}
-                            <div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <form id="depositForm" method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
-                                        @csrf
-                                        <input type="hidden" name="tipe" value="deposit">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="depositModalLabel">Deposit Saldo</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label for="depositAmount" class="form-label">Jumlah Deposit</label>
-                                                <input type="number" name="amount" class="form-control" id="depositAmount" min="1" step="0.01" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="dompet_id_deposit" class="form-label">Pilih Dompet</label>
-                                                <select id="dompet_id_deposit" name="dompet_id" class="form-control" required>
-                                                    @foreach($dompet as $item)
-                                                    <option value="{{ $item->id }}" data-saldo="{{ $item->saldo }}">{{ $item->nama }} (Rp{{ number_format($item->saldo, 0, ',', '.') }})</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn btn-success">Deposit</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            {{-- Modal Withdraw --}}
-                            <div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <form id="withdrawForm" method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
-                                        @csrf
-                                        <input type="hidden" name="tipe" value="withdraw">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="withdrawModalLabel">Withdraw Saldo</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label for="withdrawAmount" class="form-label">Jumlah Withdraw</label>
-                                                <input type="number" name="amount" class="form-control" id="withdrawAmount" min="1" step="0.01" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="dompet_id_withdraw" class="form-label">Pilih Dompet</label>
-                                                <select id="dompet_id_withdraw" name="dompet_id" class="form-control" required>
-                                                    @foreach($dompet as $item)
-                                                    <option value="{{ $item->id }}" data-saldo="{{ $item->saldo }}">{{ $item->nama }} (Rp{{ number_format($item->saldo, 0, ',', '.') }})</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn btn-outline-success">Withdraw</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            @if($dompet->isEmpty())
-                            <div class="card text-center py-5">
-                                <div class="card-body">
-                                    <i class="fas fa-clipboard fa-4x text-muted mb-3"></i>
-                                    <h5 class="card-title">You do not have any wallets yet.</h5>
-                                    <a href="{{ route('dompet.create') }}" class="btn btn-primary mt-3">Buat Dompet Baru</a>
-                                </div>
-                            </div>
-                            @endif
-
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-0">Recent Transactions</h4>
+                        <div>
+                            <a href="{{ route('transaksi.index') }}" class="btn btn-primary btn-sm me-2">
+                                View All Transactions
+                            </a>
+                            <a href="#" class="btn btn-primary btn-sm">
+                                Export Transactions
+                            </a>
                         </div>
-                        @endsection
+                    </div>
 
-                        @section('scripts')
-                        <script src="{{asset('assets')}}/libs/jquery/dist/jquery.min.js"></script>
-                        <script src="{{asset('assets')}}/libs/popper.js/dist/umd/popper.min.js"></script>
-                        <script src="{{asset('assets')}}/libs/bootstrap/dist/js/bootstrap.min.js"></script>
-                        <!-- apps -->
-                        <!-- apps -->
-                        <script src="{{asset('assets')}}/js/app-style-switcher.js"></script>
-                        <script src="{{asset('assets')}}/js/feather.min.js"></script>
-                        <script src="{{asset('assets')}}/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
-                        <script src="{{asset('assets')}}/js/sidebarmenu.js"></script>
-                        <!--Custom JavaScript -->
-                        <script src="{{asset('assets')}}/js/custom.min.js"></script>
-                        <!--This page JavaScript -->
-                        <script src="{{asset('assets')}}/extra-libs/c3/d3.min.js"></script>
-                        <script src="{{asset('assets')}}/extra-libs/c3/c3.min.js"></script>
-                        <script src="{{asset('assets')}}/libs/chartist/dist/chartist.min.js"></script>
-                        <script src="{{asset('assets')}}/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
-                        <script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
-                        <script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
-                        <script src="{{asset('assets')}}/js/pages/dashboards/dashboard1.min.js"></script>
-                        <script src="{{asset('assets')}}/libs/raphael/raphael.min.js"></script>
-                        <script src="{{asset('assets')}}/libs/morris.js/morris.min.js"></script>
-                        <script src="{{asset('assets')}}/js/pages/morris/morris-data.js"></script>
+                    @if($recentTransactions->isEmpty())
+                    <div class="text-center py-4">
+                        <i class="fas fa-exchange-alt display-1 mb-3 text-muted"></i>
+                        <p class="mb-0">No recent transactions</p>
+                    </div>
+                    @else
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Dompet</th>
+                                    <th>Kategori</th>
+                                    <th>Tipe</th>
+                                    <th>Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($recentTransactions as $transaction)
+                                <tr>
+                                    <td>{{ $transaction->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
+                                    <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
+                                            {{ ucfirst($transaction->tipe) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
+                                            Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        <script>
-                            // Deposit form validation
-                            document.getElementById('depositForm').addEventListener('submit', function(e) {
-                                const amount = parseFloat(document.getElementById('depositAmount').value);
-                                if (isNaN(amount) || amount < 1) {
-                                    e.preventDefault();
-                                    alert('Jumlah deposit harus lebih dari atau sama dengan Rp1.');
-                                    return;
-                                }
+    @if($dompet->isEmpty())
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <i class="fas fa-clipboard fa-4x text-muted mb-3"></i>
+            <h5 class="card-title">You do not have any wallets yet.</h5>
+            <a href="{{ route('dompet.create') }}" class="btn btn-primary mt-3">Buat Dompet Baru</a>
+        </div>
+    </div>
+    @endif
+</div>
+@endsection
 
-                                const dompetSelect = document.getElementById('dompet_id_deposit');
-                                if (!dompetSelect.value) {
-                                    e.preventDefault();
-                                    alert('Silakan pilih dompet terlebih dahulu.');
-                                    return;
-                                }
-                            });
+@section('scripts')
+<script src="{{asset('assets')}}/js/feather.min.js"></script>
+<script src="{{asset('assets')}}/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+<script src="{{asset('assets')}}/js/sidebarmenu.js"></script>
+<!--Custom JavaScript -->
+<script src="{{asset('assets')}}/js/custom.min.js"></script>
+<!--This page JavaScript -->
+<script src="{{asset('assets')}}/extra-libs/c3/d3.min.js"></script>
+<script src="{{asset('assets')}}/extra-libs/c3/c3.min.js"></script>
+<script src="{{asset('assets')}}/libs/chartist/dist/chartist.min.js"></script>
+<script src="{{asset('assets')}}/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
+<script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
+<script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
+<script src="{{asset('assets')}}/js/pages/dashboards/dashboard1.min.js"></script>
+<script src="{{asset('assets')}}/libs/raphael/raphael.min.js"></script>
+<script src="{{asset('assets')}}/libs/morris.js/morris.min.js"></script>
+<script src="{{asset('assets')}}/js/pages/morris/morris-data.js"></script>
 
-                            // Withdraw form validation
-                            document.getElementById('withdrawForm').addEventListener('submit', function(e) {
-                                const amount = parseFloat(document.getElementById('withdrawAmount').value);
-                                const selectedOption = document.getElementById('dompet_id_withdraw').selectedOptions[0];
-                                const saldo = parseFloat(selectedOption.getAttribute('data-saldo'));
+<script>
+    // Deposit form validation
+    document.getElementById('depositForm').addEventListener('submit', function(e) {
+        const amount = parseFloat(document.getElementById('depositAmount').value);
+        if (isNaN(amount) || amount < 1) {
+            e.preventDefault();
+            alert('Jumlah deposit harus lebih dari atau sama dengan Rp1.');
+            return;
+        }
 
-                                if (isNaN(amount) || amount < 1) {
-                                    e.preventDefault();
-                                    alert('Jumlah withdraw harus lebih dari atau sama dengan Rp1.');
-                                    return;
-                                }
+        const dompetSelect = document.getElementById('dompet_id_deposit');
+        if (!dompetSelect.value) {
+            e.preventDefault();
+            alert('Silakan pilih dompet terlebih dahulu.');
+            return;
+        }
+    });
 
-                                if (amount > saldo) {
-                                    e.preventDefault();
-                                    alert('Saldo tidak mencukupi untuk withdraw.');
-                                    return;
-                                }
+    // Withdraw form validation
+    document.getElementById('withdrawForm').addEventListener('submit', function(e) {
+        const amount = parseFloat(document.getElementById('withdrawAmount').value);
+        const selectedOption = document.getElementById('dompet_id_withdraw').selectedOptions[0];
+        const saldo = parseFloat(selectedOption.getAttribute('data-saldo'));
 
-                                const dompetSelect = document.getElementById('dompet_id_withdraw');
-                                if (!dompetSelect.value) {
-                                    e.preventDefault();
-                                    alert('Silakan pilih dompet terlebih dahulu.');
-                                    return;
-                                }
-                            });
+        if (isNaN(amount) || amount < 1) {
+            e.preventDefault();
+            alert('Jumlah withdraw harus lebih dari atau sama dengan Rp1.');
+            return;
+        }
 
-                            // Initialize Bootstrap modals
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const depositModal = new bootstrap.Modal(document.getElementById('depositModal'));
-                                const withdrawModal = new bootstrap.Modal(document.getElementById('withdrawModal'));
+        if (amount > saldo) {
+            e.preventDefault();
+            alert('Saldo tidak mencukupi untuk withdraw.');
+            return;
+        }
 
-                                // Handle deposit form submission
-                                const depositForm = document.getElementById('depositForm');
-                                const dompetSelectDeposit = document.getElementById('dompet_id_deposit');
+        const dompetSelect = document.getElementById('dompet_id_withdraw');
+        if (!dompetSelect.value) {
+            e.preventDefault();
+            alert('Silakan pilih dompet terlebih dahulu.');
+            return;
+        }
+    });
 
-                                if (depositForm && dompetSelectDeposit) {
-                                    depositForm.addEventListener('submit', function(e) {
-                                        // Get the form data
-                                        const formData = new FormData(depositForm);
+    // Initialize Bootstrap modals
+    document.addEventListener('DOMContentLoaded', function() {
+        const depositModal = new bootstrap.Modal(document.getElementById('depositModal'));
+        const withdrawModal = new bootstrap.Modal(document.getElementById('withdrawModal'));
 
-                                        // Set the action URL with the selected dompet ID
-                                        depositForm.action = "{{ route('dompet.deposit', '__id__') }}".replace('__id__', dompetSelectDeposit.value);
+        // Handle deposit form submission
+        const depositForm = document.getElementById('depositForm');
+        const dompetSelectDeposit = document.getElementById('dompet_id_deposit');
 
-                                        // Remove the dompet_id field since it's passed in the URL
-                                        formData.delete('dompet_id');
-                                        formData.delete('tipe');
-                                    });
-                                }
+        if (depositForm && dompetSelectDeposit) {
+            depositForm.addEventListener('submit', function(e) {
+                // Get the form data
+                const formData = new FormData(depositForm);
 
-                                // Handle withdraw form submission
-                                const withdrawForm = document.getElementById('withdrawForm');
-                                const dompetSelectWithdraw = document.getElementById('dompet_id_withdraw');
+                // Set the action URL with the selected dompet ID
+                depositForm.action = "{{ route('dompet.deposit', '__id__') }}".replace('__id__', dompetSelectDeposit.value);
 
-                                if (withdrawForm && dompetSelectWithdraw) {
-                                    withdrawForm.addEventListener('submit', function(e) {
-                                        // Get the form data
-                                        const formData = new FormData(withdrawForm);
+                // Remove the dompet_id field since it's passed in the URL
+                formData.delete('dompet_id');
+                formData.delete('tipe');
+            });
+        }
 
-                                        // Set the action URL with the selected dompet ID
-                                        withdrawForm.action = "{{ route('dompet.withdraw', '__id__') }}".replace('__id__', dompetSelectWithdraw.value);
+        // Handle withdraw form submission
+        const withdrawForm = document.getElementById('withdrawForm');
+        const dompetSelectWithdraw = document.getElementById('dompet_id_withdraw');
 
-                                        // Remove the dompet_id field since it's passed in the URL
-                                        formData.delete('dompet_id');
-                                        formData.delete('tipe');
-                                    });
-                                }
-                            });
-                        </script>
-                        @endsection
+        if (withdrawForm && dompetSelectWithdraw) {
+            withdrawForm.addEventListener('submit', function(e) {
+                // Get the form data
+                const formData = new FormData(withdrawForm);
+
+                // Set the action URL with the selected dompet ID
+                withdrawForm.action = "{{ route('dompet.withdraw', '__id__') }}".replace('__id__', dompetSelectWithdraw.value);
+
+                // Remove the dompet_id field since it's passed in the URL
+                formData.delete('dompet_id');
+                formData.delete('tipe');
+            });
+        }
+    });
+</script>
+@endsection
