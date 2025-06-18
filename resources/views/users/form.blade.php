@@ -45,34 +45,45 @@
                             </div>
 
                             @if(!isset($user) || !$user->exists)
+                                {{-- Form tambah user --}}
                                 <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
+                                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                        id="password" name="password">
-
-                                    @if($errors->has('password'))
-                                        <div class="invalid-feedback">{{ $errors->first('password') }}</div>
-                                    @endif
+                                        id="password" name="password" required>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $messge }}</div>
+                                    @enderror
                                 </div>
 
-
                                 <div class="mb-3">
-                                    <label for="password_confirmation" class="form-label">Confirm Password <span
-                                            class="text-danger">*</span></label>
+                                    <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control" id="password_confirmation"
                                         name="password_confirmation" required>
+                                </div>
+                            @else
+                                {{-- Form edit user - ganti password (opsional) --}}
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">New Password <small class="text-muted">(leave blank if not changing)</small></label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                        id="password" name="password">
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="password_confirmation"
+                                        name="password_confirmation">
                                 </div>
                             @endif
 
                             <div class="mb-3">
                                 <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
-                                <select class="form-select @error('role') is-invalid @enderror" id="role" name="role"
-                                    required>
+                                <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                                     <option value="">Select Role</option>
-                                    <option value="user" {{ old('role', $user->role ?? '') === 'user' ? 'selected' : '' }}>
-                                        User</option>
-                                    <option value="admin" {{ old('role', $user->role ?? '') === 'admin' ? 'selected' : '' }}>
-                                        Admin</option>
+                                    <option value="user" {{ old('role', $user->role ?? '') === 'user' ? 'selected' : '' }}>User</option>
+                                    <option value="admin" {{ old('role', $user->role ?? '') === 'admin' ? 'selected' : '' }}>Admin</option>
                                 </select>
                                 @error('role')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -82,7 +93,8 @@
                             <div class="mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="email_verified"
-                                        name="email_verified" value="1" {{ old('email_verified', (isset($user) && $user->email_verified_at) ? 'checked' : '') }}>
+                                        name="email_verified" value="1"
+                                        {{ old('email_verified', (isset($user) && $user->email_verified_at) ? 'checked' : '') }}>
                                     <label class="form-check-label" for="email_verified">
                                         Mark email as verified
                                     </label>

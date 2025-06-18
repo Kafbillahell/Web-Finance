@@ -9,31 +9,30 @@ use App\Models\User;
 
 class DompetController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $dompets = Dompet::latest()->get();
-        
-        if (!$dompets) {
-            $dompets = collect([]);
-        }
 
-        // Get recent transactions
         $recentTransactions = Transaksi::with('dompet', 'kategori')
             ->latest()
             ->take(5)
             ->get();
 
-        $total_dompet = $dompets->count();
-        $total_saldo = $dompets->sum('saldo');
-        $jenis_dompet = $dompets->pluck('nama')->unique()->count();
-        $dompet_terpilih = $dompets->take(4);
-
-        return view('dompet.index', compact('dompets', 'total_dompet', 'total_saldo', 'jenis_dompet', 'dompet_terpilih', 'recentTransactions'));
+        return view('dompet.index', [
+            'dompets' => $dompets,
+            'total_dompet' => $dompets->count(),
+            'total_saldo' => $dompets->sum('saldo'),
+            'jenis_dompet' => $dompets->pluck('nama')->unique()->count(),
+            'dompet_terpilih' => $dompets->take(4),
+            'recentTransactions' => $recentTransactions,
+        ]);
     }
+
     public function create()
     {
-        $users = User::all();
-        return view('dompet.form', compact('users'));
+        return view('dompet.form', [
+            'users' => User::all(),
+        ]);
     }
 
     public function store(Request $request)
@@ -44,15 +43,17 @@ class DompetController extends Controller
             'saldo' => 'nullable|numeric',
         ]);
 
-        Dompet::create($request->all());
+        Dompet::create($request->only(['user_id', 'nama', 'saldo']));
 
         return redirect()->route('dompet.index')->with('success', 'Berhasil ditambahkan');
     }
 
     public function edit(Dompet $dompet)
     {
-        $users = User::all();
-        return view('dompet.form', compact('dompet', 'users'));
+        return view('dompet.form', [
+            'dompet' => $dompet,
+            'users' => User::all(),
+        ]);
     }
 
     public function update(Request $request, Dompet $dompet)
@@ -63,7 +64,7 @@ class DompetController extends Controller
             'saldo' => 'nullable|numeric',
         ]);
 
-        $dompet->update($request->all());
+        $dompet->update($request->only(['user_id', 'nama', 'saldo']));
 
         return redirect()->route('dompet.index')->with('success', 'Berhasil diperbarui');
     }
@@ -73,5 +74,61 @@ class DompetController extends Controller
         $dompet->delete();
 
         return redirect()->route('dompet.index')->with('success', 'Berhasil dihapus');
+    }
+
+    public function deposit(Request $request, Dompet $dompet)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01'
+        ]);
+
+        // Pastikan amount positif
+        $amount = abs($request->amount);
+
+        $dompet->saldo += $amount;
+        $dompet->save();
+
+        Transaksi::create([
+            'dompet_id' => $dompet->id,
+            'kategori_id' => null,
+            'tipe' => 'pemasukan',
+            'nominal' => $amount,
+            'keterangan' => 'Deposit Saldo',
+            'tanggal' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Deposit berhasil.');
+    }
+
+    public function withdraw(Request $request, Dompet $dompet)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01'
+        ]);
+
+        // Pastikan ambil ulang data saldo terbaru
+        $dompet->refresh();
+
+        // Pastikan amount positif
+        $amount = abs($request->amount);
+
+        if ($dompet->saldo < $amount) {
+            return redirect()->back()->with('error', 'Saldo tidak cukup.');
+        }
+
+        // Kurangi saldo
+        $dompet->saldo -= $amount;
+        $dompet->save();
+
+        Transaksi::create([
+            'dompet_id' => $dompet->id,
+            'kategori_id' => null,
+            'tipe' => 'pengeluaran',
+            'nominal' => $amount, // nominal selalu positif
+            'keterangan' => 'Withdraw Saldo',
+            'tanggal' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Withdraw berhasil.');
     }
 }
