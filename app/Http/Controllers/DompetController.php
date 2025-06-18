@@ -12,9 +12,13 @@ class DompetController extends Controller
 {
     public function index()
     {
-        $dompets = Dompet::latest()->get();
+        $user = Auth::user();
+        $dompets = $user->dompets()->latest()->get();
 
         $recentTransactions = Transaksi::with('dompet', 'kategori')
+            ->whereHas('dompet', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
             ->latest()
             ->take(5)
             ->get();

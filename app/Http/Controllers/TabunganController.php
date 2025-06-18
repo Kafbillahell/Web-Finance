@@ -13,22 +13,27 @@ class TabunganController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Tabungan::with('user');
+        $user = Auth::user();
+        $search = $request->search;
 
-        if ($request->has('search')) {
-            $search = $request->search;
+        $query = Tabungan::with('user')
+            ->where('user_id', $user->id);
+
+        if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($user) use ($search) {
-                        $user->where('name', 'like', "%{$search}%");
+                    ->orWhereHas('user', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
                     });
             });
         }
 
-        $tabungans = $query->latest()->paginate(10);
+        $tabungans = $query->latest()
+            ->paginate(10);
+
         return view('tabungan.index', [
             'tabungans' => $tabungans,
-            'dompets' => Dompet::all()
+            'dompets' => Dompet::where('user_id', $user->id)->get()
         ]);
     }
 
@@ -66,7 +71,7 @@ class TabunganController extends Controller
         ]);
 
         Tabungan::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::user()->id,
             'nama' => $request->nama,
             'saldo' => $request->saldo,
             'target' => $request->target
@@ -136,7 +141,6 @@ class TabunganController extends Controller
 
     public function withdrawSaldo(Request $request, $id)
     {
-
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'dompet_id' => 'required|exists:dompets,id'
