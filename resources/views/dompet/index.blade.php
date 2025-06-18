@@ -30,7 +30,6 @@
         position: relative;
         overflow: hidden;
         cursor: pointer;
-        margin: 1rem 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -176,12 +175,10 @@
                 <div class="row g-3">
                     @php
                     $cardClasses = ['wallet-card', 'wallet-card wallet-card-blue', 'wallet-card wallet-card-green', 'wallet-card wallet-card-orange', 'wallet-card wallet-card-pink'];
-                    @endphp
-
+                    @endphp                
                     @forelse($dompet_terpilih ?? [] as $index => $dompet)
-                    <div class="col-12"> {{-- Each wallet card takes full width of the column --}}
-                        {{-- Add a data attribute for the wallet ID to use with JavaScript for dynamic content loading --}}
-                        <div class="{{ $cardClasses[$index % count($cardClasses)] }}" data-wallet-id="{{ $dompet->id }}">
+                    <div class="col-12">
+                        <div class="{{ $cardClasses[($index + 1) % count($cardClasses)] }}" onclick="showTransactions('{{ $dompet->id }}')" data-wallet-id="{{ $dompet->id }}">
                             <div class="wallet-balance">Rp {{ number_format($dompet->saldo ?? 0, 0, ',', '.') }}</div>
                             <div class="wallet-name">{{ $dompet->nama ?? 'Wallet Name' }}</div>
                             <div class="mt-2">
@@ -197,9 +194,12 @@
                         </div>
                     </div>
                     @endforelse
-                    <a href="{{ route('dompet.create') }}" class="btn btn-primary btn-rounded" id="add-wallet-btn">
-                        <i class="fas fa-plus-circle me-2"></i>Add Wallet
-                    </a>
+
+                    <div class="col-12">
+                        <a href="{{ route('dompet.create') }}" class="btn btn-primary btn-rounded d-block">
+                            <i class="fas fa-plus-circle me-2"></i>Add Wallet
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -242,7 +242,7 @@
                                 <div class="text-center py-4">
                                     <i class="fas fa-exchange-alt display-1 mb-3 text-muted"></i>
                                     <p class="mb-0">No recent transactions</p>
-                                </div> 
+                                </div>
                                 @else
                                 <div class="table-responsive">
                                     <table class="table table-hover">
@@ -286,3 +286,27 @@
     </div>
 </div>
 @endsection
+@section('script')
+<script>
+    function showTransactions(walletId) {
+        const transactionsContainer = document.getElementById('transactions-container');
+
+        if (!transactionsContainer) return;
+
+        transactionsContainer.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>';
+
+        fetch(`/api/transactions/${walletId === 'all' ? '' : walletId}`)
+            .then(response => response.json())
+            .then(data => {
+                transactionsContainer.innerHTML = data.html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                transactionsContainer.innerHTML = '<div class="alert alert-danger">Failed to load transactions</div>';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showTransactions('all');
+    });
+</script>

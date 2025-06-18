@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Dompet;
 
 class User extends Authenticatable
 {
@@ -33,5 +34,10 @@ class User extends Authenticatable
     public function transaksi()
     {
         return $this->hasMany(Transaksi::class);
+    }
+
+    public function dompets()
+    {
+        return $this->hasMany(Dompet::class);
     }
 }
