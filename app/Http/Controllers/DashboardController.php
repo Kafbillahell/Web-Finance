@@ -36,13 +36,17 @@ class DashboardController extends Controller
         $monthlyTotals = [];
         for ($month = 1; $month <= 12; $month++) {
             $income = Transaksi::where('user_id', $user->id)
-                ->where('tipe', 'pemasukan')
+                ->whereHas('kategori', function ($query) {
+                    $query->where('tipe', 'pemasukan');
+                })
                 ->whereYear('created_at', now()->year)
                 ->whereMonth('created_at', $month)
                 ->sum('nominal');
-            
+
             $expense = Transaksi::where('user_id', $user->id)
-                ->where('tipe', 'pengeluaran')
+                ->whereHas('kategori', function ($query) {
+                    $query->where('tipe', 'pengeluaran');
+                })
                 ->whereYear('created_at', now()->year)
                 ->whereMonth('created_at', $month)
                 ->sum('nominal');
@@ -132,4 +136,6 @@ class DashboardController extends Controller
 
         return redirect()->route('dashboard')->with('success', ucfirst($tipe) . ' saldo berhasil.');
     }
+
+    
 }

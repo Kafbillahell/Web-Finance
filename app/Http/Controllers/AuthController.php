@@ -17,15 +17,29 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email', // ← sesuai input form
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
+        $remember = $request->has('remember');
+
+        // Cek autentikasi
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('dashboard'));
+            $user = Auth::user();
+
+            // Redirect sesuai dengan role pengguna
+            if ($user->role === 'admin') {
+                return redirect('admin/dashboard');  // Halaman admin
+            }
+
+            if ($user->role === 'user') {
+                return redirect('dashboard');  // Halaman kasir
+            }
+
+            abort(403, 'Unauthorized role.');
         }
 
         return back()->with('message', 'Login gagal. Periksa kembali email atau password.');

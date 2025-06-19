@@ -13,6 +13,7 @@
                     </a>
                 </li>
                 <li class="list-divider"></li>
+                @if($role === 'user')
                 <li class="nav-small-cap"><span class="hide-menu">Money Management</span></li>
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="{{ route('tabungan.index') }}" aria-expanded="false">
@@ -45,6 +46,8 @@
                     </a>
                 </li>
                 <li class="list-divider"></li>
+                @endif
+
 
                 @if($role === 'admin')
                 <!-- User Management Section -->
