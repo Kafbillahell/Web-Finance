@@ -1,7 +1,12 @@
 @php
-    $role = auth()->user()->role;
+$role = auth()->user()->role;
 @endphp
 
+<style>
+    .sidebar-link {
+        text-decoration: none !important;
+    }
+</style>
 <aside class="left-sidebar" data-sidebarbg="skin6">
     <div class="scroll-sidebar" data-sidebarbg="skin6">
         <nav class="sidebar-nav">
