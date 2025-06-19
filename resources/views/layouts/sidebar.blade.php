@@ -2,6 +2,16 @@
     $role = auth()->user()->role;
 @endphp
 
+@push('style')
+<style>
+    .left-sidebar .sidebar-nav .sidebar-link,
+    .left-sidebar .sidebar-nav .sidebar-link:hover,
+    .left-sidebar .sidebar-nav .sidebar-link:focus {
+        text-decoration: none !important;
+    }
+</style>
+@endpush
+
 <aside class="left-sidebar" data-sidebarbg="skin6">
     <div class="scroll-sidebar" data-sidebarbg="skin6">
         <nav class="sidebar-nav">
@@ -58,9 +68,7 @@
                 <li class="list-divider"></li>
                 @endif
 
-
                 @if($role === 'admin')
-                <!-- User Management Section -->
                 <li class="nav-small-cap"><span class="hide-menu">User Management</span></li>
                 <li class="sidebar-item">
                     <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">

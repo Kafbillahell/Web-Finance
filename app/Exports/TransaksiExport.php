@@ -19,13 +19,23 @@ class TransaksiExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        if ($this->type == 'recent') {
-            return Transaksi::latest()->take(5)->get(); 
-        } else {
-            return Transaksi::all(); 
-        }
-    }
+        $query = Transaksi::orderBy('created_at', 'desc');
 
+        if ($this->type === 'recent') {
+            $query->limit(5);
+        }
+
+        return $query->get()->map(function ($item) {
+            return [
+                'Tanggal'    => $item->created_at->format('d/m/Y H:i'),
+                'Kategori'   => $item->kategori->nama ?? '-',
+                'Tipe'       => $item->kategori->tipe ?? '-',
+                'Nominal'    => 'Rp ' . number_format($item->nominal, 0, ',', '.'),
+                'Keterangan' => $item->keterangan ?? '-',
+                'Dompet'     => $item->dompet->nama ?? '-',
+            ];
+        });
+    }
     public function headings(): array
     {
         return ['Tanggal', 'Kategori', 'Tipe', 'Nominal', 'Keterangan', 'Dompet'];
