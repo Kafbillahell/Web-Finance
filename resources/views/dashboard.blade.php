@@ -6,7 +6,7 @@
 <link href="{{ asset('assets/libs/chartist/dist/chartist.min.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/extra-libs/jvector/jquery-jvectormap-2.0.2.css') }}" rel="stylesheet" />
 <link href="{{ asset('assets/libs/morris.js/morris.css') }}" rel="stylesheet">
-<link href="{{ asset('assets/dist/css/style.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/style.min.css') }}" rel="stylesheet">
 <style>
     body {
         font-family: 'Inter', sans-serif;
@@ -81,7 +81,7 @@
     @foreach(['deposit' => 'Deposit Saldo', 'withdraw' => 'Withdraw Saldo'] as $type => $title)
     <div class="modal fade" id="{{ $type }}Modal" tabindex="-1" aria-labelledby="{{ $type }}ModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
-            <form method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
+            <form id="{{ $type }}Form" method="POST" action="{{ route('dashboard.store') }}" class="modal-content">
                 @csrf
                 <input type="hidden" name="tipe" value="{{ $type }}">
                 <div class="modal-header bg-success text-white">
@@ -103,9 +103,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn {{ $type == 'deposit' ? 'btn-success' : 'btn-outline-success' }} w-100">
-                        <i class="fas fa-check-circle me-2"></i> Konfirmasi
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">{{ ucfirst($type) }}</button>
                 </div>
             </form>
         </div>
