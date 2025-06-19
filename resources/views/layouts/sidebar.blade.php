@@ -6,12 +6,22 @@
     <div class="scroll-sidebar" data-sidebarbg="skin6">
         <nav class="sidebar-nav">
             <ul id="sidebarnav">
+                @if($role === 'user')
                 <li class="sidebar-item">
                     <a class="sidebar-link sidebar-link" href="{{ route('dashboard') }}" aria-expanded="false">
                         <i class="fas fa-tachometer-alt"></i>
                         <span class="hide-menu">Dashboard</span>
                     </a>
                 </li>
+                @endif
+                @if($role === 'admin')
+                <li class="sidebar-item">
+                    <a class="sidebar-link sidebar-link" href="{{ route('admin.dashboard') }}" aria-expanded="false">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="hide-menu">Dashboard</span>
+                    </a>
+                </li>
+                @endif
                 <li class="list-divider"></li>
                 @if($role === 'user')
                 <li class="nav-small-cap"><span class="hide-menu">Money Management</span></li>
