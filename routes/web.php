@@ -50,8 +50,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
     // CRUD Resource
     Route::resource('users', UserController::class);
-    Route::resource('kategori', KategoriController::class)->except(['show']);
-    Route::resource('transaksi', TransaksiController::class);
-    Route::resource('dompet', DompetController::class);
-    Route::resource('tabungan', TabunganController::class);
+    
 });
