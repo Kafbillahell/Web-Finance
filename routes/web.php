@@ -50,4 +50,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
     // CRUD Resource
     Route::resource('users', UserController::class);
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 794b187b6c5332aa502fd460ebbc9b3ff15fad13
 });
