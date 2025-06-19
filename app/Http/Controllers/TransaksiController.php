@@ -7,6 +7,8 @@ use App\Models\Dompet;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TransaksiExport;
 
 class TransaksiController extends Controller
 {
@@ -138,5 +140,10 @@ class TransaksiController extends Controller
         $transaksi->delete();
 
         return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil dihapus.');
+    }
+
+    public function exportTransaksi($type)
+    {
+        return Excel::download(new TransaksiExport($type), 'transaksi-'.$type.'.xlsx');
     }
 }

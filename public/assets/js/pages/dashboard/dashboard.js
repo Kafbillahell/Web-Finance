@@ -1,53 +1,64 @@
-// Deposit form validation
-document.getElementById("depositForm").addEventListener("submit", function (e) {
-    const amount = parseFloat(document.getElementById("depositAmount").value);
-    if (isNaN(amount) || amount < 1) {
-        e.preventDefault();
-        alert("Jumlah deposit harus lebih dari atau sama dengan Rp1.");
-        return;
-    }
-
-    const dompetSelect = document.getElementById("dompet_id_deposit");
-    if (!dompetSelect.value) {
-        e.preventDefault();
-        alert("Silakan pilih dompet terlebih dahulu.");
-        return;
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form validation
+    initializeFormValidation();
+    initializeModals();
 });
 
-// Withdraw form validation
-document
-    .getElementById("withdrawForm")
-    .addEventListener("submit", function (e) {
-        const amount = parseFloat(
-            document.getElementById("withdrawAmount").value
-        );
-        const selectedOption =
-            document.getElementById("dompet_id_withdraw").selectedOptions[0];
-        const saldo = parseFloat(selectedOption.getAttribute("data-saldo"));
+function initializeFormValidation() {
+    // Deposit form validation
+    const depositForm = document.getElementById("depositForm");
+    if (depositForm) {
+        depositForm.addEventListener("submit", function (e) {
+            const amount = parseFloat(document.getElementById("depositAmount").value);
+            const dompetSelect = document.getElementById("dompet_id_deposit");
+            
+            if (isNaN(amount) || amount < 1) {
+                e.preventDefault();
+                alert("Jumlah deposit harus lebih dari atau sama dengan Rp1.");
+                return;
+            }
 
-        if (isNaN(amount) || amount < 1) {
-            e.preventDefault();
-            alert("Jumlah withdraw harus lebih dari atau sama dengan Rp1.");
-            return;
-        }
+            if (!dompetSelect.value) {
+                e.preventDefault();
+                alert("Silakan pilih dompet terlebih dahulu.");
+                return;
+            }
+        });
+    }
 
-        if (amount > saldo) {
-            e.preventDefault();
-            alert("Saldo tidak mencukupi untuk withdraw.");
-            return;
-        }
+    // Withdraw form validation
+    const withdrawForm = document.getElementById("withdrawForm");
+    if (withdrawForm) {
+        withdrawForm.addEventListener("submit", function (e) {
+            const amount = parseFloat(document.getElementById("withdrawAmount").value);
+            const dompetSelect = document.getElementById("dompet_id_withdraw");
+            
+            if (isNaN(amount) || amount < 1) {
+                e.preventDefault();
+                alert("Jumlah withdraw harus lebih dari atau sama dengan Rp1.");
+                return;
+            }
 
-        const dompetSelect = document.getElementById("dompet_id_withdraw");
-        if (!dompetSelect.value) {
-            e.preventDefault();
-            alert("Silakan pilih dompet terlebih dahulu.");
-            return;
-        }
-    });
+            if (!dompetSelect.value) {
+                e.preventDefault();
+                alert("Silakan pilih dompet terlebih dahulu.");
+                return;
+            }
 
-// Initialize Bootstrap modals
-document.addEventListener("DOMContentLoaded", function () {
+            const selectedOption = dompetSelect.selectedOptions[0];
+            const saldo = parseFloat(selectedOption.getAttribute("data-saldo"));
+
+            if (amount > saldo) {
+                e.preventDefault();
+                alert("Saldo tidak mencukupi untuk withdraw.");
+                return;
+            }
+        });
+    }
+}
+
+function initializeModals() {
+    // Initialize Bootstrap modals
     const depositModal = new bootstrap.Modal(
         document.getElementById("depositModal")
     );
@@ -61,10 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (depositForm && dompetSelectDeposit) {
         depositForm.addEventListener("submit", function (e) {
-            // Get the form data
             const formData = new FormData(depositForm);
-
-            // Set the action URL with the selected dompet ID
             depositForm.action =
                 "{{ route('dompet.deposit', '__id__') }}".replace(
                     "__id__",
@@ -76,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.delete("tipe");
         });
     }
+}
 
     // Handle withdraw form submission
     const withdrawForm = document.getElementById("withdrawForm");
@@ -91,11 +100,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 "{{ route('dompet.withdraw', '__id__') }}".replace(
                     "__id__",
                     dompetSelectWithdraw.value
-                );
+                )
 
-            // Remove the dompet_id field since it's passed in the URL
             formData.delete("dompet_id");
             formData.delete("tipe");
-        });
+        })
     }
 });
