@@ -50,7 +50,7 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('tabungan.history') }}" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('transaksi.tabungan') }}" aria-expanded="false">
                         <i class="fas fa-history"></i>
                         <span class="hide-menu">Transaksi Tabungan</span>
                     </a>

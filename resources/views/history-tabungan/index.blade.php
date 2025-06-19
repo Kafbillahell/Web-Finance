@@ -2,34 +2,106 @@
 
 @section('style')
 <style>
+    /* Base */
     body {
         font-family: 'Inter', sans-serif;
-        background-color: #f8f9fa;
-        /* Light gray background */
+        margin: 0;
+        padding: 1rem;
+        background-color: #F9FAFB;
+        color: #1F2937;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .card {
-        border: none;
-        border-radius: 1rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s ease-in-out;
+        background-color: #FFFFFF;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
-    .card:hover {
-        transform: translateY(-5px);
-    }
-
-    .table-custom {
-        border-radius: 1rem;
-        overflow: hidden;
-        /* Ensures the border-radius is applied to the table */
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-primary {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
+    .transaction-card {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
         border-radius: 0.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        margin-bottom: 0.75rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .transaction-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #F3F4F6;
+    }
+
+    .transaction-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .transaction-date {
+        font-size: 0.875rem;
+        color: #6B7280;
+    }
+
+    .transaction-desc {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #111827;
+    }
+
+    .transaction-category {
+        display: inline-block;
+        margin-top: 0.25rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+    }
+
+    .transaction-amount {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+
+    .amount-expense {
+        color: #DC2626;
+    }
+
+    .amount-income {
+        color: #16A34A;
+    }
+
+    .header-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .uppercase {
+        text-transform: capitalize;
+    }
+
+    .category-expense {
+        background-color: #FEE2E2;
+        color: #C62828;
+    }
+
+    .category-income {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+
+    .transaction-dompet {
+        font-size: 0.875rem;
+        color: #6B7280;
+        background-color: #F9FAFB;
     }
 </style>
 @endsection
@@ -55,53 +127,28 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
-                    @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                </div>
+                @endif
+                <h3 class="header-title">Transaksi Tabungan ({{ $transaksis->count() }})</h3>
+                @forelse ($transaksis as $transaksi)
+                <div class="transaction-card" data-toggle="modal" data-target="#modalTransaksi{{ $transaksi->id }}">
+                    <div class="transaction-info">
+                        <span class="transaction-date">{{ $transaksi->created_at->format('M d, Y') }}</span>
+                        <span class="transaction-desc">{{ $transaksi->dompet->nama }}, {{ $transaksi->keterangan }}</span>
+                        <span class="transaction-category uppercase {{ $transaksi->tipe === 'deposit' ? 'category-income' : 'category-expense' }}"> {{ $transaksi->tipe }}</span>
                     </div>
-                    @endif
-
-                    <h4 class="card-title">Transaksi Tabungan List</h4>
-
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Tabungan</th>
-                                    <th>Dompet</th>
-                                    <th>Tipe</th>
-                                    <th>Nominal</th>
-                                    <th>Keterangan</th>
-                                    <th>Tanggal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($transaksis as $trx)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $trx->tabungan->nama ?? 'N/A' }}</td>
-                                    <td>{{ $trx->dompet->nama ?? 'N/A' }}</td>
-                                    <td>
-                                        <span class="badge px-3 py-2 rounded-pill 
-                                        {{ $trx->tipe === 'deposit' ? 'bg-success text-white' : 'bg-danger text-white' }}">
-                                            {{ ucfirst($trx->tipe) }}
-                                        </span>
-                                    </td>
-                                    <td>Rp {{ number_format($trx->nominal, 2, ',', '.') }}</td>
-                                    <td>{{ $trx->keterangan }}</td>
-                                    <td>{{ $trx->created_at->format('d/m/Y H:i') }}</td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="7" class="text-center">No tabungan transactions found.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <div class="transaction-amount {{ $transaksi->tipe === 'deposit' ? 'amount-income' : 'amount-expense' }}">
+                        {{ $transaksi->tipe === 'deposit' ? '+' : '-' }} Rp {{ number_format($transaksi->nominal, 2, ',', '.') }}
                     </div>
                 </div>
+                @empty
+                <div class="card-body">
+                    <p>Tidak ada transaksi tabungan.</p>
+                </div>
+                @endforelse
             </div>
         </div>
     </div>
