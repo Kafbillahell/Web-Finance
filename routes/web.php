@@ -43,6 +43,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/dompet/{id}/deposit', [DompetController::class, 'deposit'])->name('dompet.deposit');
     Route::post('/dompet/{id}/withdraw', [DompetController::class, 'withdraw'])->name('dompet.withdraw');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
+    Route::get('/export/transaksi/{type}', [TransaksiController::class, 'exportTransaksi'])->name('export.transaksi');
+
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

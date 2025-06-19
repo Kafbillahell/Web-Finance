@@ -154,7 +154,7 @@
                             <a href="{{ route('transaksi.index') }}" class="btn btn-primary btn-sm me-2">
                                 View All Transactions
                             </a>
-                            <a href="#" class="btn btn-primary btn-sm">
+                            <a href=" {{ route ('export.transaksi', 'recent')  }}" class="btn btn-primary btn-sm">
                                 Export Transactions
                             </a>
                         </div>
