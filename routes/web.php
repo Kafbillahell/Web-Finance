@@ -28,6 +28,11 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/form', [DashboardController::class, 'form'])->name('form');
 
+    Route::resource('kategori', KategoriController::class)->except(['show']);
+    Route::resource('transaksi', TransaksiController::class);
+    Route::resource('dompet', DompetController::class);
+    Route::resource('tabungan', TabunganController::class);
+
     // Tabungan fitur tambahan
     Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');
     Route::post('/tabungan/{id}/withdraw-saldo', [TabunganController::class, 'withdrawSaldo'])->name('tabungan.withdrawSaldo');
