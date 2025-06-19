@@ -53,7 +53,7 @@ class DompetController extends Controller
             'saldo' => $request->saldo
         ]);
 
-        return redirect()->route('dompet.index')->with('success', 'Berhasil ditambahkan');
+        return redirect()->route('dompet.index')->with('success', 'Dompet Berhasil ditambahkan');
     }
 
     public function edit(Dompet $dompet)

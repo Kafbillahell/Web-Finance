@@ -64,10 +64,10 @@
                                             <a href="{{ url("kategori/$row->id/edit") }}" class="btn btn-warning btn-sm">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form method="POST" action="{{ route('kategori.destroy', $row->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                            <form id="deleteForm-{{ $row->id }}" method="POST" action="{{ route('kategori.destroy', $row->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $row->id }})">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>

@@ -35,6 +35,7 @@
 
     <div id="main-wrapper" data-theme="light" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed" data-boxed-layout="full">
         @include('layouts.header')
+        @include('partials.alert')
         @include('layouts.sidebar')
         <div class="page-wrapper">
             @yield('content')

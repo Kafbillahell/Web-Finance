@@ -89,13 +89,17 @@ class TabunganController extends Controller
     public function update(Request $request, Tabungan $tabungan)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'nama'    => 'required|string|max:255',
             'saldo'   => 'required|numeric|min:0',
             'target'  => 'nullable|numeric|min:0',
         ]);
 
-        $tabungan->update($request->all());
+        $tabungan->update([
+            'user_id' => Auth::id(),
+            'nama'    => $request->nama,
+            'saldo'   => $request->saldo,
+            'target'  => $request->target,
+        ]);
 
         return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil diperbarui.');
     }
@@ -132,15 +136,16 @@ class TabunganController extends Controller
         $dompet->saldo -= $request->amount;
         $dompet->save();
 
-        if($dompet->saldo > $request->amount){
+        if ($dompet->saldo > $request->amount) {
             return back()->with('error', 'Saldo dompet anda tidak cukup.');
         }
 
-        return response()->json([
+        return back()->with([
+            'success' => 'Saldo berhasil diperbarui!',
             'saldo' => $tabungan->saldo,
             'target' => $tabungan->target,
             'saldo_formatted' => number_format($tabungan->saldo, 2, ',', '.')
-        ], 200);
+        ]);
     }
 
     public function withdrawSaldo(Request $request, $id)

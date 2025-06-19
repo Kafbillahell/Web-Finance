@@ -167,10 +167,10 @@
                     <a href="{{ route('tabungan.edit', $tabungan->id) }}" class="btn btn-sm btn-outline-primary me-2">
                         <i class="fas fa-pen"></i> Edit
                     </a>
-                    <form action="{{ route('tabungan.destroy', $tabungan->id) }}" method="POST" class="d-inline">
+                    <form id="deleteForm-{{ $tabungan->id }}" action="{{ route('tabungan.destroy', $tabungan->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
-                        <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">
+                        <button class="btn btn-sm btn-outline-danger" type="button" onclick="confirmDelete({{ $tabungan->id }})">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </form>
