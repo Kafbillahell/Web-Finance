@@ -63,9 +63,7 @@ $role = auth()->user()->role;
                 <li class="list-divider"></li>
                 @endif
 
-
                 @if($role === 'admin')
-                <!-- User Management Section -->
                 <li class="nav-small-cap"><span class="hide-menu">User Management</span></li>
                 <li class="sidebar-item">
                     <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
