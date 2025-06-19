@@ -133,15 +133,15 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-8 col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Bar Chart</h4>
-                    <div id="morris-bar-chart"></div>
-                </div>
-            </div>
+       <div class="col-lg-8 col-md-12">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Bar Chart</h4>
+            <div id="morris-bar-chart" style="height: 300px;"></div>
         </div>
     </div>
+</div>
+
 
     <div class="row mt-4">
         <div class="col-12">
