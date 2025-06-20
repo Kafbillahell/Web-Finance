@@ -28,6 +28,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/form', [DashboardController::class, 'form'])->name('form');
+    Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+    Route::get('/profile/edit', [DashboardController::class, 'editProfile'])->name('profile.edit');
+    Route::post('/profile/update', [DashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::delete('/profile', [DashboardController::class, 'destroyProfile'])->name('profile.delete');
 
     Route::resource('kategori', KategoriController::class)->except(['show']);
     Route::resource('transaksi', TransaksiController::class);
