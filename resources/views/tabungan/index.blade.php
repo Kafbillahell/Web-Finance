@@ -4,12 +4,13 @@
     body {
         font-family: 'Inter', sans-serif;
     }
+
     .savings-card {
         border: none;
         border-radius: 1rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
         background-color: #ffffff;
-        padding: 2rem;
+        padding: 1rem;
         transition: all 0.3s ease;
     }
 
@@ -87,7 +88,7 @@
 @section('content')
 <div class="page-breadcrumb">
     <div class="row">
-        <div class="col-7 align-self-center">
+        <div class="col-8 align-self-center">
             <h4 class="page-title text-truncate text-dark font-weight-medium mb-1">Tabungan</h4>
             <div class="d-flex align-items-center">
                 <nav aria-label="breadcrumb">
@@ -98,7 +99,7 @@
                 </nav>
             </div>
         </div>
-        <div class="col-5 align-self-center">
+        <div class="col-4 align-self-end">
             <div class="d-flex justify-content-between">
                 <div>
                     <a href="{{ route('tabungan.create') }}" class="btn btn-primary btn-rounded me-2">
@@ -145,35 +146,37 @@
                             <span class="sr-only">{{ $progress }}% Complete</span>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#modalSaldo"
-                            data-id="{{ $tabungan->id }}" data-nama="{{ $tabungan->nama }}" data-action="add">
-                            Tambah Saldo
-                        </button>
-
-                        <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalSaldo"
-                            data-id="{{ $tabungan->id }}" data-nama="{{ $tabungan->nama }}" data-action="withdraw">
-                            Tarik Saldo
-                        </button>
+                    <div>
+                        <div class="mt-3 d-flex justify-content-between">
+                            <div>
+                                <button class="btn btn-sm btn-success me-2" data-toggle="modal" data-target="#modalSaldo"
+                                    data-id="{{ $tabungan->id }}" data-nama="{{ $tabungan->nama }}" data-action="add">
+                                    Tambah Saldo
+                                </button>
+                                <button class="btn btn-sm btn-danger me-2" data-toggle="modal" data-target="#modalSaldo"
+                                    data-id="{{ $tabungan->id }}" data-nama="{{ $tabungan->nama }}" data-action="withdraw">
+                                    Tarik Saldo
+                                </button>
+                            </div>
+                            <div>
+                                <a href="{{ route('tabungan.edit', $tabungan->id) }}" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-pen"></i> Edit
+                                </a>
+                                <form id="deleteForm-{{ $tabungan->id }}" action="{{ route('tabungan.destroy', $tabungan->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger" type="button" onclick="confirmDelete({{ $tabungan->id }})">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between small text-muted mb-3">
                     <div>Dibuat pada: {{ $tabungan->created_at->format('d M Y') }}</div>
                     <div>Created by: {{ $tabungan->user->name ?? 'Unknown' }}</div>
-                </div>
- 
-                <div class="text-end">
-                    <a href="{{ route('tabungan.edit', $tabungan->id) }}" class="btn btn-sm btn-outline-primary me-2">
-                        <i class="fas fa-pen"></i> Edit
-                    </a>
-                    <form id="deleteForm-{{ $tabungan->id }}" action="{{ route('tabungan.destroy', $tabungan->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-sm btn-outline-danger" type="button" onclick="confirmDelete({{ $tabungan->id }})">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>
