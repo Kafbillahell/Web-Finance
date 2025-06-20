@@ -466,7 +466,7 @@
                                 alert('Failed to fetch search results.');
                             }
                         });
-                    }, 300);
+                    }, 0);
                 }
             });
 
