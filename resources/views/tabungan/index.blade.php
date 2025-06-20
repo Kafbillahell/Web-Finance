@@ -253,8 +253,8 @@
     </div>
 </div>
 
-    <!-- Modal Tambah Saldo -->
-   <div class="modal fade" id="modalSaldo" tabindex="-1" aria-labelledby="modalSaldoLabel" aria-hidden="true">
+<!-- Modal Tambah Saldo -->
+<div class="modal fade" id="modalSaldo" tabindex="-1" aria-labelledby="modalSaldoLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form id="formSaldo" method="POST">
             @csrf
@@ -276,7 +276,7 @@
                         <label for="dompet" class="form-label" id="labelDompet">Dari/Ke Dompet</label>
                         <select class="form-select" name="dompet_id" id="dompet" required>
                             @foreach($dompets as $dompet)
-                                <option value="{{ $dompet->id }}">{{ $dompet->nama }}</option>
+                            <option value="{{ $dompet->id }}">{{ $dompet->nama }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -290,73 +290,78 @@
 </div>
 @endsection
 @section('scripts')
-    <script>
-        $(document).ready(function () {
-            let searchTimeout;
-            const searchInput = $('#liveSearchInput');
-            const tabunganContainer = $('.container-fluid > .row');
-            const paginationContainer = $('.d-flex.justify-content-center.mt-4');
-            let modalSaldo = $('#modalSaldo'); // Gunakan 'let' agar bisa di-reassign
-            const formSaldo = $('#formSaldo');
+<script>
+    $(document).ready(function() {
+        let searchTimeout;
+        const searchInput = $('#liveSearchInput');
+        const tabunganContainer = $('.container-fluid > .row');
+        const paginationContainer = $('.d-flex.justify-content-center.mt-4');
+        let modalSaldo = $('#modalSaldo'); // Gunakan 'let' agar bisa di-reassign
+        const formSaldo = $('#formSaldo');
 
-            // --- Diagnostik Penting untuk Debugging Modal ---
-            modalSaldo.on('show.bs.modal', function () {
-                console.log('MODAL EVENT: show.bs.modal - Modal is about to be shown.');
+        // --- Diagnostik Penting untuk Debugging Modal ---
+        modalSaldo.on('show.bs.modal', function() {
+            console.log('MODAL EVENT: show.bs.modal - Modal is about to be shown.');
+            if ($('.modal-backdrop').length) {
+                console.warn('MODAL WARNING: Modal backdrop detected before show.bs.modal. Forcing removal.');
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+            }
+        });
+        modalSaldo.on('shown.bs.modal', function() {
+            console.log('MODAL EVENT: shown.bs.modal - Modal is fully shown.');
+            console.log('  Body classes:', $('body').attr('class'));
+            console.log('  Modal backdrop count:', $('.modal-backdrop').length);
+        });
+        modalSaldo.on('hide.bs.modal', function() {
+            console.log('MODAL EVENT: hide.bs.modal - Modal is about to be hidden.');
+        });
+        modalSaldo.on('hidden.bs.modal', function() {
+            console.log('MODAL EVENT: hidden.bs.modal - Modal is fully hidden. Starting cleanup process...');
+
+            setTimeout(function() {
                 if ($('.modal-backdrop').length) {
-                    console.warn('MODAL WARNING: Modal backdrop detected before show.bs.modal. Forcing removal.');
+                    console.warn('MODAL WARNING: Modal backdrop still present. Force removing.');
                     $('.modal-backdrop').remove();
+                }
+                if ($('body').hasClass('modal-open')) {
+                    console.warn('MODAL WARNING: body still has modal-open class. Force removing.');
                     $('body').removeClass('modal-open');
                 }
-            });
-            modalSaldo.on('shown.bs.modal', function () {
-                console.log('MODAL EVENT: shown.bs.modal - Modal is fully shown.');
-                console.log('  Body classes:', $('body').attr('class'));
-                console.log('  Modal backdrop count:', $('.modal-backdrop').length);
-            });
-            modalSaldo.on('hide.bs.modal', function () {
-                console.log('MODAL EVENT: hide.bs.modal - Modal is about to be hidden.');
-            });
-            modalSaldo.on('hidden.bs.modal', function () {
-                console.log('MODAL EVENT: hidden.bs.modal - Modal is fully hidden. Starting cleanup process...');
-                
-                setTimeout(function() {
-                    if ($('.modal-backdrop').length) {
-                        console.warn('MODAL WARNING: Modal backdrop still present. Force removing.');
-                        $('.modal-backdrop').remove();
-                    }
-                    if ($('body').hasClass('modal-open')) {
-                        console.warn('MODAL WARNING: body still has modal-open class. Force removing.');
-                        $('body').removeClass('modal-open');
-                    }
-                    if ($('body').css('padding-right') !== '') {
-                        console.warn('MODAL WARNING: body still has padding-right. Force resetting.');
-                        $('body').css('padding-right', '');
-                    }
+                if ($('body').css('padding-right') !== '') {
+                    console.warn('MODAL WARNING: body still has padding-right. Force resetting.');
+                    $('body').css('padding-right', '');
+                }
 
-                    if (modalSaldo.data('bs.modal')) {
-                        modalSaldo.modal('dispose');
-                        console.log('MODAL INFO: Modal disposed to fully reset its state.');
-                    }
-                    
-                    // Cek dan tampilkan alert jika ada pesan yang tersimpan
-                    const alertMessage = modalSaldo.data('alert-message');
-                    if (alertMessage) {
-                        alert(alertMessage);
-                        modalSaldo.removeData('alert-message'); // Hapus pesan setelah ditampilkan
-                    }
+                if (modalSaldo.data('bs.modal')) {
+                    modalSaldo.modal('dispose');
+                    console.log('MODAL INFO: Modal disposed to fully reset its state.');
+                }
 
-                    // Reset form di sini, setelah alert dan cleanup
-                    formSaldo[0].reset(); 
-                    console.log('MODAL INFO: Form reset after modal hidden.');
-                    
-                    // Re-initialize modal
-                    modalSaldo = $('#modalSaldo');
-                    modalSaldo.modal({ backdrop: true, keyboard: true, focus: true, show: false });
-                    console.log('MODAL INFO: Modal re-initialized for next use.');
+                // Cek dan tampilkan alert jika ada pesan yang tersimpan
+                const alertMessage = modalSaldo.data('alert-message');
+                if (alertMessage) {
+                    alert(alertMessage);
+                    modalSaldo.removeData('alert-message'); // Hapus pesan setelah ditampilkan
+                }
 
-                }, 150);
-            });
-            // --- Akhir Diagnostik ---
+                // Reset form di sini, setelah alert dan cleanup
+                formSaldo[0].reset();
+                console.log('MODAL INFO: Form reset after modal hidden.');
+
+                // Re-initialize modal
+                modalSaldo = $('#modalSaldo');
+                modalSaldo.modal({
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true,
+                    show: false
+                });
+                console.log('MODAL INFO: Modal re-initialized for next use.');
+
+            }, 150);
+        });
+        // --- Akhir Diagnostik ---
 
         // Function to format currency
         function formatRupiah(number) {
@@ -438,149 +443,180 @@
                 `;
         }
 
-            // --- Live Search functionality ---
-            searchInput.on('input', function () {
-                clearTimeout(searchTimeout);
-                const searchTerm = $(this).val();
+        // --- Live Search functionality ---
+        searchInput.on('input', function() {
+            clearTimeout(searchTimeout);
+            const searchTerm = $(this).val();
 
-                if (searchTerm.length >= 1 || searchTerm.length === 0) {
-                    searchTimeout = setTimeout(function () {
-                        $.ajax({
-                            url: "{{ route('tabungan.index') }}",
-                            method: 'GET',
-                            data: { search: searchTerm, ajax: true },
-                            success: function (response) {
-                                tabunganContainer.empty();
-                                if (response.tabungans.length > 0) {
-                                    response.tabungans.forEach(function (tabungan) {
-                                        tabunganContainer.append(renderTabunganCard(tabungan));
-                                    });
-                                } else {
-                                    tabunganContainer.append('<div class="col-12"><p class="text-center">Tidak ada tabungan yang ditemukan.</p></div>');
-                                }
-                                paginationContainer.html(response.pagination);
-                                attachModalEventListeners();
-                            },
-                            error: function (xhr) {
-                                console.error('Error during live search:', xhr.responseText);
-                                alert('Failed to fetch search results.');
+            if (searchTerm.length >= 1 || searchTerm.length === 0) {
+                searchTimeout = setTimeout(function() {
+                    $.ajax({
+                        url: "{{ route('tabungan.index') }}",
+                        method: 'GET',
+                        data: {
+                            search: searchTerm,
+                            ajax: true
+                        },
+                        success: function(response) {
+                            tabunganContainer.empty();
+                            if (response.tabungans.length > 0) {
+                                response.tabungans.forEach(function(tabungan) {
+                                    tabunganContainer.append(renderTabunganCard(tabungan));
+                                });
+                            } else {
+                                tabunganContainer.append('<div class="col-12"><p class="text-center">Tidak ada tabungan yang ditemukan.</p></div>');
                             }
-                        });
-                    }, 0);
-                }
-            });
-
-            // --- Pagination links for AJAX ---
-            $(document).on('click', '.pagination a.page-link', function (e) {
-                e.preventDefault();
-                const url = $(this).attr('href');
-                const searchTerm = searchInput.val();
-
-                $.ajax({
-                    url: url,
-                    method: 'GET',
-                    data: { search: searchTerm, ajax: true },
-                    success: function (response) {
-                        tabunganContainer.empty();
-                        response.tabungans.forEach(function (tabungan) {
-                            tabunganContainer.append(renderTabunganCard(tabungan));
-                        });
-                        paginationContainer.html(response.pagination);
-                        attachModalEventListeners();
-                    },
-                    error: function (xhr) {
-                        console.error('Error during pagination:', xhr.responseText);
-                        alert('Failed to load pagination results.');
-                    }
-                });
-            });
-
-            // --- Function to attach event listeners for the modal buttons ---
-            function attachModalEventListeners() {
-                // IMPORTANT: Use .off('click') to prevent duplicate handlers
-                $(document).off('click', '[data-toggle="modal"][data-target="#modalSaldo"]').on('click', '[data-toggle="modal"][data-target="#modalSaldo"]', function (event) {
-                    const button = $(event.currentTarget);
-                    const id = button.data('id');
-                    const nama = button.data('nama');
-                    const action = button.data('action');
-
-                    $('#tabunganId').val(id);
-                    $('#amount').val(''); // Clear any previous input value
-
-                    if (action === 'add') {
-                        $('#modalSaldoTitle').text('Tambah Saldo ke ' + nama);
-                        formSaldo.attr('action', '/tabungan/' + id + '/add-saldo');
-                        $('#submitButton').text('Tambah').removeClass('btn-danger').addClass('btn-primary');
-                        $('#labelDompet').text('Dari Dompet');
-                    } else {
-                        $('#modalSaldoTitle').text('Tarik Saldo dari ' + nama);
-                        formSaldo.attr('action', '/tabungan/' + id + '/withdraw-saldo');
-                        $('#submitButton').text('Tarik').removeClass('btn-primary').addClass('btn-danger');
-                        $('#labelDompet').text('Ke Dompet');
-                    }
-                    modalSaldo.modal('show');
-                });
-
-                // **TAMBAHAN PENTING:** Event listener untuk tombol "X" (close) di modal
-                // Menggunakan delegated event untuk memastikan event tetap berfungsi pada elemen yang dinamis
-                $(document).off('click', '#modalSaldo .close').on('click', '#modalSaldo .close', function() {
-                    console.log('Clicked modal close button (X). Hiding modal.');
-                    modalSaldo.modal('hide');
-                });
-            }
-
-            attachModalEventListeners(); // Initial call for buttons present on page load
-
-            // --- Submit form tambah/tarik saldo ---
-            formSaldo.submit(function (e) {
-                e.preventDefault();
-                const url = $(this).attr('action');
-                const formData = $(this).serialize();
-
-                $.post(url, formData, function (response) {
-                    try {
-                        if (response.error) {
-                            alert(response.message);
-                            console.log('AJAX SUCCESS (with error): Message:', response.message);
-                        } else {
-                            const tabunganId = $('#tabunganId').val();
-                            const cardElement = $('[data-id="' + tabunganId + '"]').closest('.savings-card');
-                            if (cardElement.length) {
-                                $('#saldo-' + tabunganId).text(response.saldo_formatted);
-                                const progressBar = cardElement.find('.progress-bar');
-                                const newProgress = Math.min(100, (response.saldo / response.target) * 100);
-                                progressBar.css('width', newProgress + '%');
-                                progressBar.attr('aria-valuenow', newProgress);
-                                progressBar.find('.sr-only').text(newProgress.toFixed(0) + '% Complete');
-                                console.log('AJAX SUCCESS: UI updated for tabungan ID:', tabunganId);
-                            }
-
-                            console.log('AJAX SUCCESS: Attempting to hide modal.');
-                            modalSaldo.modal('hide');
-                            
-                            modalSaldo.data('alert-message', response.message);
+                            paginationContainer.html(response.pagination);
+                            attachModalEventListeners();
+                        },
+                        error: function(xhr) {
+                            console.error('Error during live search:', xhr.responseText);
+                            alert('Failed to fetch search results.');
                         }
-                    } catch (error) {
-                        console.error('AJAX SUCCESS CALLBACK ERROR:', error);
-                        alert('Terjadi kesalahan saat memproses respons. Silakan coba lagi.');
-                    }
-                }).fail(function (xhr) {
-                    console.error('AJAX FAILED:', xhr.responseText);
-                    try {
-                        const error = JSON.parse(xhr.responseText);
-                        alert(error.message || 'Gagal memproses saldo');
-                    } catch (e) {
-                        alert('Gagal memproses saldo. Error: ' + xhr.status + ' ' + xhr.statusText);
-                    }
-                });
+                    });
+                }, 0);
+            }
+        });
+
+        // --- Pagination links for AJAX ---
+        $(document).on('click', '.pagination a.page-link', function(e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            const searchTerm = searchInput.val();
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {
+                    search: searchTerm,
+                    ajax: true
+                },
+                success: function(response) {
+                    tabunganContainer.empty();
+                    response.tabungans.forEach(function(tabungan) {
+                        tabunganContainer.append(renderTabunganCard(tabungan));
+                    });
+                    paginationContainer.html(response.pagination);
+                    attachModalEventListeners();
+                },
+                error: function(xhr) {
+                    console.error('Error during pagination:', xhr.responseText);
+                    alert('Failed to load pagination results.');
+                }
+            });
+        });
+
+        // --- Function to attach event listeners for the modal buttons ---
+        function attachModalEventListeners() {
+            // IMPORTANT: Use .off('click') to prevent duplicate handlers
+            $(document).off('click', '[data-toggle="modal"][data-target="#modalSaldo"]').on('click', '[data-toggle="modal"][data-target="#modalSaldo"]', function(event) {
+                const button = $(event.currentTarget);
+                const id = button.data('id');
+                const nama = button.data('nama');
+                const action = button.data('action');
+
+                $('#tabunganId').val(id);
+                $('#amount').val(''); // Clear any previous input value
+
+                if (action === 'add') {
+                    $('#modalSaldoTitle').text('Tambah Saldo ke ' + nama);
+                    formSaldo.attr('action', '/tabungan/' + id + '/add-saldo');
+                    $('#submitButton').text('Tambah').removeClass('btn-danger').addClass('btn-primary');
+                    $('#labelDompet').text('Dari Dompet');
+                } else {
+                    $('#modalSaldoTitle').text('Tarik Saldo dari ' + nama);
+                    formSaldo.attr('action', '/tabungan/' + id + '/withdraw-saldo');
+                    $('#submitButton').text('Tarik').removeClass('btn-primary').addClass('btn-danger');
+                    $('#labelDompet').text('Ke Dompet');
+                }
+                modalSaldo.modal('show');
             });
 
-            // --- Confirm delete function ---
-            window.confirmDelete = function (id) {
-                if (confirm('Apakah Anda yakin ingin menghapus tabungan ini?')) {
-                    $(`#deleteForm-${id}`).is('form') ? $(`#deleteForm-${id}`).submit() : console.error('Delete form not found or is not a form element.');
+            // **TAMBAHAN PENTING:** Event listener untuk tombol "X" (close) di modal
+            // Menggunakan delegated event untuk memastikan event tetap berfungsi pada elemen yang dinamis
+            $(document).off('click', '#modalSaldo .close').on('click', '#modalSaldo .close', function() {
+                console.log('Clicked modal close button (X). Hiding modal.');
+                modalSaldo.modal('hide');
+            });
+        }
+
+        attachModalEventListeners(); // Initial call for buttons present on page load
+
+        // --- Submit form tambah/tarik saldo ---
+        formSaldo.submit(function(e) {
+            e.preventDefault();
+            const url = $(this).attr('action');
+            const formData = $(this).serialize();
+
+            $.post(url, formData, function(response) {
+                try {
+                    if (response.error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: response.message || 'Terjadi kesalahan saat memproses saldo.',
+                            confirmButtonColor: '#d33'
+                        });
+                        console.log('AJAX SUCCESS (with error): Message:', response.message);
+                    } else {
+                        const tabunganId = $('#tabunganId').val();
+                        const cardElement = $('[data-id="' + tabunganId + '"]').closest('.savings-card');
+                        if (cardElement.length) {
+                            $('#saldo-' + tabunganId).text(response.saldo_formatted);
+                            const progressBar = cardElement.find('.progress-bar');
+                            const newProgress = Math.min(100, (response.saldo / response.target) * 100);
+                            progressBar.css('width', newProgress + '%');
+                            progressBar.attr('aria-valuenow', newProgress);
+                            progressBar.find('.sr-only').text(newProgress.toFixed(0) + '% Complete');
+                            console.log('AJAX SUCCESS: UI updated for tabungan ID:', tabunganId);
+                        }
+
+                        console.log('AJAX SUCCESS: Attempting to hide modal.');
+                        modalSaldo.modal('hide');
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message || 'Saldo berhasil diperbarui.',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                } catch (error) {
+                    console.error('AJAX SUCCESS CALLBACK ERROR:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kesalahan!',
+                        text: 'Terjadi kesalahan saat memproses respons.',
+                        confirmButtonColor: '#d33'
+                    });
                 }
-            };
+            }).fail(function(xhr) {
+                console.error('AJAX FAILED:', xhr.responseText);
+                try {
+                    const error = JSON.parse(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: error.message || 'Gagal memproses saldo.',
+                        confirmButtonColor: '#d33'
+                    });
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kesalahan!',
+                        text: 'Gagal memproses saldo. Error: ' + xhr.status + ' ' + xhr.statusText,
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            });
         });
-    </script>
+
+        // --- Confirm delete function ---
+        window.confirmDelete = function(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus tabungan ini?')) {
+                $(`#deleteForm-${id}`).is('form') ? $(`#deleteForm-${id}`).submit() : console.error('Delete form not found or is not a form element.');
+            }
+        };
+    });
+</script>
 @endsection
