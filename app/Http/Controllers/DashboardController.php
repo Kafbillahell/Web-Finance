@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-// use Illuminate\Support\Facades\Auth;
-
 class DashboardController extends Controller
 {
     public function index()
@@ -32,7 +30,6 @@ class DashboardController extends Controller
             ->sum('nominal');
         $totalTabungan = Tabungan::where('user_id', $user->id)->sum('saldo');
 
-        // Calculate monthly totals
         $monthlyTotals = [];
         for ($month = 1; $month <= 12; $month++) {
             $income = Transaksi::where('user_id', $user->id)
@@ -60,36 +57,31 @@ class DashboardController extends Controller
 
         $kategoriTransaksi = \App\Models\Kategori::all();
 
-        // Loop dan hitung total nominal per kategori untuk user login
         foreach ($kategoriTransaksi as $kategori) {
             $total = $kategori->transaksi()
                 ->where('user_id', $user->id)
                 ->sum('nominal');
 
-            // Tambahkan properti manual untuk digunakan di view
             $kategori->total_nominal = $total;
         }
 
-        // Filter hanya kategori yang ada transaksinya dan urutkan dari kecil ke besar
         $kategoriTransaksi = $kategoriTransaksi
             ->filter(function ($item) {
                 return $item->total_nominal > 0;
             })
-            ->sortBy('total_nominal') // 🔁 URUTKAN dari nominal terkecil
+            ->sortBy('total_nominal')
             ->values();
 
-        // Get recent transactions with proper loading of relationships
         $recentTransactions = Transaksi::with(['dompet', 'kategori'])
             ->where('user_id', $user->id)
             ->latest()
             ->take(5)
             ->get()
             ->each(function ($transaction) {
-                // If transaction has no kategori, create a default one
                 if (!$transaction->kategori) {
                     $defaultCategory = Kategori::firstOrCreate([
                         'nama' => 'Uncategorized',
-                        'tipe' => $transaction->tipe,
+                        'tipe' => $transaction->tipe, 
                         'id_user' => Auth::id(),
                     ]);
                     $transaction->kategori()->associate($defaultCategory);
@@ -115,7 +107,7 @@ class DashboardController extends Controller
 
         $amount = $request->amount;
         $tipe = $request->tipe;
-        $tipeTransaksi = $tipe === 'withdraw' ? 'pengeluaran' : 'pemasukan';
+        $tipeTransaksiKategori = $tipe === 'withdraw' ? 'pengeluaran' : 'pemasukan';
 
         $saldoSekarang = $dompet->saldo ?? 0;
 
@@ -130,10 +122,9 @@ class DashboardController extends Controller
 
         $dompet->update(['saldo' => $saldoBaru]);
 
-        // Cari atau buat kategori otomatis
         $kategori = Kategori::firstOrCreate(
             ['nama' => ucfirst($tipe), 'id_user' => $user->id],
-            ['tipe' => $tipeTransaksi, 'id_user' => $user->id]
+            ['tipe' => $tipeTransaksiKategori]
         );
 
         Transaksi::create([
@@ -142,11 +133,8 @@ class DashboardController extends Controller
             'kategori_id' => $kategori->id,
             'nominal' => $amount,
             'keterangan' => ucfirst($tipe) . ' saldo melalui dashboard',
-            'tipe' => $tipeTransaksi,
         ]);
 
         return redirect()->route('dashboard')->with('success', ucfirst($tipe) . ' saldo berhasil.');
     }
-
-    
 }
