@@ -287,12 +287,28 @@
 </div>
 @endsection
 @section('scripts')
-<script>
-    $(document).ready(function() {
-        let searchTimeout;
-        const searchInput = $('#liveSearchInput');
-        const tabunganContainer = $('.container-fluid > .row'); // The container where tabungan cards are displayed
-        const paginationContainer = $('.d-flex.justify-content-center.mt-4'); // The pagination container
+    <script>
+        $(document).ready(function () {
+            let searchTimeout;
+            const searchInput = $('#liveSearchInput');
+            const tabunganContainer = $('.container-fluid > .row');
+            const paginationContainer = $('.d-flex.justify-content-center.mt-4');
+            const modalSaldo = $('#modalSaldo'); // Ambil referensi modal
+            const formSaldo = $('#formSaldo');   // Ambil referensi form modal
+
+            // Tambahkan elemen untuk loading spinner
+            // Letakkan spinner di dalam form pencarian agar sejajar dengan input
+            const searchForm = searchInput.closest('form');
+            const loadingSpinner = $('<div class="spinner-border spinner-border-sm text-primary ms-2" role="status" style="display: none;"><span class="visually-hidden">Loading...</span></div>');
+            searchForm.append(loadingSpinner);
+
+            // --- FUNGSI UNTUK MENGATASI MODAL BACKDROP TETAP ABU-ABU (Bootstrap 4) ---
+            modalSaldo.on('hidden.bs.modal', function () {
+                // Hapus backdrop secara manual jika masih ada
+                $('.modal-backdrop').remove();
+                // Juga, pastikan class 'modal-open' hilang dari body
+                $('body').removeClass('modal-open');
+            });
 
         // Function to format currency
         function formatRupiah(number) {
@@ -374,41 +390,135 @@
                 `;
         }
 
-        // Live Search functionality
-        searchInput.on('input', function() {
-            clearTimeout(searchTimeout); // Clear previous timeout
-            const searchTerm = $(this).val();
-
-            if (searchTerm.length >= 1 || searchTerm.length === 0) { // Search when 2+ chars or clear search
-                searchTimeout = setTimeout(function() {
-                    $.ajax({
-                        url: "{{ route('tabungan.index') }}",
-                        method: 'GET',
-                        data: {
-                            search: searchTerm,
-                            ajax: true
-                        }, // Pass ajax: true to identify AJAX request
-                        success: function(response) {
-                            tabunganContainer.empty(); // Clear existing cards
-                            if (response.tabungans.length > 0) {
-                                response.tabungans.forEach(function(tabungan) {
-                                    tabunganContainer.append(renderTabunganCard(tabungan));
-                                });
-                            } else {
-                                tabunganContainer.append('<div class="col-12"><p class="text-center">Tidak ada tabungan yang ditemukan.</p></div>');
-                            }
-                            paginationContainer.html(response.pagination); // Update pagination
-
-                            // Re-attach event listeners for newly rendered buttons
-                            attachModalEventListeners();
-                        },
-                        error: function(xhr) {
-                            console.error('Error during live search:', xhr.responseText);
-                            alert('Failed to fetch search results.');
+            // --- FUNGSI UTAMA UNTUK MELAKUKAN PENCARIAN AJAX ---
+            function performSearch(searchTerm, page = 1) {
+                loadingSpinner.show(); // Tampilkan spinner
+                $.ajax({
+                    url: "{{ route('tabungan.index') }}",
+                    method: 'GET',
+                    data: { search: searchTerm, ajax: true, page: page },
+                    success: function (response) {
+                        tabunganContainer.empty();
+                        if (response.tabungans.length > 0) {
+                            response.tabungans.forEach(function (tabungan) {
+                                tabunganContainer.append(renderTabunganCard(tabungan));
+                            });
+                        } else {
+                            tabunganContainer.append('<div class="col-12"><p class="text-center text-muted">Tidak ada tabungan yang ditemukan.</p></div>');
                         }
-                    });
-                }, 0); // 500ms delay
+                        paginationContainer.html(response.pagination);
+                        attachModalEventListeners(); // Re-attach listeners for new buttons
+                    },
+                    error: function (xhr) {
+                        console.error('Error during live search:', xhr.responseText);
+                        alert('Gagal mengambil hasil pencarian.');
+                    },
+                    complete: function () {
+                        loadingSpinner.hide(); // Sembunyikan spinner setelah request selesai
+                    }
+                });
             }
+
+            // Live Search functionality
+            searchInput.on('input', function () {
+                clearTimeout(searchTimeout); // Clear previous timeout
+                const searchTerm = $(this).val();
+
+                // Panggil pencarian jika minimal 1 karakter atau jika input kosong (untuk reset)
+                if (searchTerm.length >= 1 || searchTerm.length === 0) {
+                    searchTimeout = setTimeout(function () {
+                        performSearch(searchTerm);
+                    }, 300); // Sesuaikan delay ini jika perlu (misal: 200, 300, 500)
+                }
+            });
+
+            // Pagination links for AJAX
+            $(document).on('click', '.pagination a.page-link', function (e) {
+                e.preventDefault();
+                const url = new URL($(this).attr('href'));
+                const page = url.searchParams.get('page'); // Dapatkan nomor halaman dari URL
+                const searchTerm = searchInput.val(); // Ambil searchTerm terbaru dari input
+
+                performSearch(searchTerm, page); // Panggil fungsi pencarian utama dengan nomor halaman
+            });
+
+            // --- FUNGSI UNTUK MELAMPIRKAN EVENT LISTENER KE TOMBOL MODAL ---
+            function attachModalEventListeners() {
+                // Menggunakan event delegation karena card dirender ulang
+                $(document).off('click', '[data-toggle="modal"][data-target="#modalSaldo"]') // Hapus listener lama jika ada
+                       .on('click', '[data-toggle="modal"][data-target="#modalSaldo"]', function (event) {
+                    const button = $(event.currentTarget);
+                    const id = button.data('id');
+                    const nama = button.data('nama');
+                    const action = button.data('action');
+
+                    $('#tabunganId').val(id);
+                    $('#amount').val(''); // Kosongkan input amount setiap kali modal dibuka
+
+                    if (action === 'add') {
+                        $('#modalSaldoTitle').text('Tambah Saldo ke ' + nama);
+                        formSaldo.attr('action', '/tabungan/' + id + '/add-saldo');
+                        $('#submitButton').text('Tambah').removeClass('btn-danger').addClass('btn-primary');
+                        $('#labelDompet').text('Dari Dompet');
+                    } else {
+                        $('#modalSaldoTitle').text('Tarik Saldo dari ' + nama);
+                        formSaldo.attr('action', '/tabungan/' + id + '/withdraw-saldo');
+                        $('#submitButton').text('Tarik').removeClass('btn-primary').addClass('btn-danger');
+                        $('#labelDompet').text('Ke Dompet');
+                    }
+                    // Tampilkan modal secara manual
+                    modalSaldo.modal('show');
+                });
+            }
+
+            // Panggil saat halaman pertama kali dimuat untuk tombol yang sudah ada
+            attachModalEventListeners();
+
+            // Submit form tambah/tarik saldo
+            formSaldo.submit(function (e) {
+                e.preventDefault();
+                const url = $(this).attr('action');
+                const formData = $(this).serialize();
+
+                $.post(url, formData, function (response) {
+                    if (response.error) {
+                        alert(response.message);
+                    } else {
+                        // Update tampilan saldo pada kartu yang bersangkutan
+                        const tabunganId = $('#tabunganId').val();
+                        const tabunganCard = $('[data-id="' + tabunganId + '"]').closest('.savings-card');
+
+                        // Update Saldo
+                        tabunganCard.find('#saldo-' + tabunganId).text(response.saldo_formatted);
+
+                        // Update Progress Bar
+                        const progressBar = tabunganCard.find('.progress-bar');
+                        const newProgress = Math.min(100, (response.saldo / response.target) * 100);
+                        progressBar.css('width', newProgress + '%');
+                        progressBar.attr('aria-valuenow', newProgress);
+                        progressBar.find('.sr-only').text(newProgress.toFixed(0) + '% Complete');
+
+                        // Tutup modal
+                        modalSaldo.modal('hide'); // Menggunakan referensi modal yang sudah disimpan
+                        alert(response.message); // Tampilkan pesan sukses
+                    }
+                }).fail(function (xhr) {
+                    console.error('Error processing saldo:', xhr.responseText);
+                    try {
+                        const error = JSON.parse(xhr.responseText);
+                        alert(error.message || 'Gagal memproses saldo');
+                    } catch (e) {
+                        alert('Gagal memproses saldo. Error: ' + xhr.status + ' ' + xhr.statusText);
+                    }
+                });
+            });
+
+            // Confirm delete function (make sure it's accessible globally or correctly scoped)
+            window.confirmDelete = function (id) {
+                if (confirm('Apakah Anda yakin ingin menghapus tabungan ini?')) {
+                    $(`#deleteForm-${id}`).submit();
+                }
+            };
         });
 
         // Pagination links for AJAX
