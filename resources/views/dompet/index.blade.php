@@ -252,7 +252,7 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <span class="fw-bold text-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
+                                                    <span class="fw-bold text-{{ $transaction->kategori->tipe === 'pemasukan' ? 'success' : 'danger' }}">
                                                         Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
                                                     </span>
                                                 </td>
