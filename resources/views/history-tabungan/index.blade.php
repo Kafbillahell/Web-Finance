@@ -2,18 +2,8 @@
 
 @section('style')
 <style>
-    /* Base */
     body {
         font-family: 'Inter', sans-serif;
-        margin: 0;
-        padding: 1rem;
-        background-color: #F9FAFB;
-        color: #1F2937;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
     }
 
     .card {
@@ -65,12 +55,20 @@
         font-size: 0.75rem;
     }
 
+    }
+
     .transaction-wallet {
         display: inline-block;
         margin-top: 0.25rem;
         padding: 0.125rem 0.5rem;
         border-radius: 9999px;
         font-size: 0.75rem;
+    }
+
+    .wallet {
+        font-size: 0.875rem;
+        color: #6B7280;
+        background-color: #F9FAFB;
     }
 
     .transaction-amount {
@@ -104,12 +102,6 @@
     .category-income {
         background-color: #D1FAE5;
         color: #065F46;
-    }
-
-    .wallet {
-        font-size: 0.875rem;
-        color: #6B7280;
-        background-color: #F9FAFB;
     }
 </style>
 @endsection

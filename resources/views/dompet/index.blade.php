@@ -118,34 +118,14 @@
         padding: 0.375rem 0.75rem;
     }
 
-    .wallet-status {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 0.5rem;
-    }
-
-    .status-active {
-        background-color: #28a745;
-    }
-
-    .status-inactive {
-        background-color: #dc3545;
-    }
-
-    /* New styles for the two-column layout */
     .wallet-navigation {
         height: calc(100vh - 100px);
-        /* Adjust based on your header/footer height */
         overflow-y: auto;
         padding-right: 15px;
-        /* Add some padding for scrollbar */
     }
 
     .main-content {
         height: calc(100vh - 100px);
-        /* Adjust based on your header/footer height */
         overflow-y: auto;
     }
 </style>
@@ -179,18 +159,16 @@
                     @forelse($dompet_terpilih ?? [] as $index => $dompet)
                     <div class="col-12">
                         <div class="{{ $cardClasses[($index + 1) % count($cardClasses)] }}" onclick="showTransactions('{{ $dompet->id }}')" data-wallet-id="{{ $dompet->id }}">
-                            <form id="deleteForm-{{ $dompet->id }}" method="POST" action="{{ route('dompet.destroy', $dompet->id) }}" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="confirmDelete({{ $dompet->id }})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
                             <div class="wallet-balance">Rp {{ number_format($dompet->saldo ?? 0, 0, ',', '.') }}</div>
                             <div class="wallet-name">{{ $dompet->nama ?? 'Wallet Name' }}</div>
                             <div class="mt-2">
-                                <div class="wallet-status {{ $dompet->status === 'active' ? 'status-active' : 'status-inactive' }}"></div>
-                                <small class="opacity-75 ms-2">{{ $dompet->tipe ?? 'Cash' }}</small>
+                                <form id="deleteForm-{{ $dompet->id }}" method="POST" action="{{ route('dompet.destroy', $dompet->id) }}" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="confirmDelete({{ $dompet->id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
