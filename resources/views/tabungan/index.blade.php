@@ -612,11 +612,11 @@
         });
 
         // --- Confirm delete function ---
-        window.confirmDelete = function(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus tabungan ini?')) {
-                $(`#deleteForm-${id}`).is('form') ? $(`#deleteForm-${id}`).submit() : console.error('Delete form not found or is not a form element.');
-            }
-        };
+        // window.confirmDelete = function(id) {
+        //     if (confirm('Apakah Anda yakin ingin menghapus tabungan ini?')) {
+        //         $(`#deleteForm-${id}`).is('form') ? $(`#deleteForm-${id}`).submit() : console.error('Delete form not found or is not a form element.');
+        //     }
+        // };
     });
 </script>
 @endsection
