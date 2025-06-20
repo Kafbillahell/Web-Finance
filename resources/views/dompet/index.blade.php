@@ -262,8 +262,8 @@
                                                 <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
                                                 <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
                                                 <td>
-                                                    <span class="badge bg-{{ $transaction->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                                        {{ ucfirst($transaction->tipe) }}
+                                                    <span class="badge bg-{{ $transaction->kategori->tipe === 'pemasukan' ? 'success' : 'danger' }}">
+                                                        {{ ucfirst($transaction->kategori->tipe) }}
                                                     </span>
                                                 </td>
                                                 <td>

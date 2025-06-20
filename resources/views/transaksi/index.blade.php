@@ -107,13 +107,6 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> -->
-                            </div>
-                        @endif
-
                         <h4 class="card-title">Transaksi List</h4>
                         <div class="d-flex justify-content-end mb-3">
                             <a href="{{ route('export.transaksi', 'all') }}" class="btn btn-primary btn-sm">

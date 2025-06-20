@@ -27,11 +27,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+                    
 
                     <h4 class="card-title">Daftar Kategori</h4>
 

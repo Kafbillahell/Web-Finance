@@ -127,11 +127,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                </div>
-                @endif
+                
                 <h3 class="header-title">Transaksi Tabungan ({{ $transaksis->count() }})</h3>
                 @forelse ($transaksis as $transaksi)
                 <div class="transaction-card" data-toggle="modal" data-target="#modalTransaksi{{ $transaksi->id }}">
