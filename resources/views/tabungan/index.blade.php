@@ -108,8 +108,10 @@
                 </div>
                 <div>
                     <form class="d-flex" action="{{ route('tabungan.index') }}" method="GET">
-                        <input class="form-control me-2" type="search" name="search" placeholder="Search tabungan...">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
+                        <input class="form-control me-2" type="search" name="search" id="liveSearchInput"
+                            placeholder="Search tabungan...">
+                        <button class="btn btn-outline-success" type="submit">
+                            <i class="fas fa-search"></i> </button>
                     </form>
                 </div>
             </div>
@@ -228,7 +230,8 @@
                                 <span class="page-link">...</span>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="{{ $tabungans->url($tabungans->lastPage()) }}">{{ $tabungans->lastPage() }}</a>
+                                <a class="page-link"
+                                    href="{{ $tabungans->url($tabungans->lastPage()) }}">{{ $tabungans->lastPage() }}</a>
                             </li>
                             @endif
 
@@ -286,99 +289,229 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        // Saat modal dibuka (baik tambah maupun tarik)
-        $('#modalSaldo').on('show.bs.modal', function(event) {
-            const button = $(event.relatedTarget);
-            const id = button.data('id');
-            const nama = button.data('nama');
-            const action = button.data('action'); // "add" atau "withdraw"
+        let searchTimeout;
+        const searchInput = $('#liveSearchInput');
+        const tabunganContainer = $('.container-fluid > .row'); // The container where tabungan cards are displayed
+        const paginationContainer = $('.d-flex.justify-content-center.mt-4'); // The pagination container
 
-            $('#tabunganId').val(id);
+        // Function to format currency
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(number);
+        }
 
-            if (action === 'add') {
-                $('#modalSaldoTitle').text('Tambah Saldo ke ' + nama);
-                $('#formSaldo').attr('action', '/tabungan/' + id + '/add-saldo');
-                $('#submitButton').text('Tambah').removeClass('btn-danger').addClass('btn-primary');
-                $('#labelDompet').text('Dari Dompet');
-            } else {
-                $('#modalSaldoTitle').text('Tarik Saldo dari ' + nama);
-                $('#formSaldo').attr('action', '/tabungan/' + id + '/withdraw-saldo');
-                $('#submitButton').text('Tarik').removeClass('btn-primary').addClass('btn-danger');
-                $('#labelDompet').text('Ke Dompet');
-            }
-        });
-
-        // Submit form tambah/tarik saldo
-        $('#formSaldo').submit(function(e) {
-            e.preventDefault();
-            const url = $(this).attr('action');
-
-            $.post(url, $(this).serialize(), function(response) {
-                location.reload();
-            }).fail(function(xhr) {
-                alert('Gagal memproses saldo');
+        // Function to render a single tabungan card
+        function renderTabunganCard(tabungan) {
+            const progress = tabungan.target > 0 ? Math.min(100, (tabungan.saldo / tabungan.target) * 100) : 0;
+            const formattedSaldo = formatRupiah(tabungan.saldo);
+            const formattedTarget = formatRupiah(tabungan.target);
+            const createdAt = new Date(tabungan.created_at).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
             });
+            const userName = tabungan.user ? tabungan.user.name : 'Unknown';
+
+            return `
+                    <div class="col-12 mb-4">
+                        <div class="savings-card">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="i_tbng fas fa-piggy-bank text-success"></i>
+                                <h4 class="mb-0 fw-bold">${tabungan.nama ?? 'Unnamed Goal'}</h4>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between" data-id="${tabungan.id}">
+                                    <small class="text-muted">Saldo</small>
+                                    <small class="fw-semibold" id="saldo-${tabungan.id}">${formattedSaldo}</small>
+                                </div>
+                                <div class="d-flex justify-content-between" data-id="${tabungan.id}">
+                                    <small class="text-muted">Target</small>
+                                    <small class="fw-semibold">${formattedTarget}</small>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-success" role="progressbar"
+                                        style="width: ${progress}%"
+                                        aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
+                                        <span class="sr-only">${progress.toFixed(0)}% Complete</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#modalSaldo"
+                                        data-id="${tabungan.id}" data-nama="${tabungan.nama}" data-action="add">
+                                        Tambah Saldo
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalSaldo"
+                                        data-id="${tabungan.id}" data-nama="${tabungan.nama}" data-action="withdraw">
+                                        Tarik Saldo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between small text-muted mb-3">
+                                <div>Dibuat pada: ${createdAt}</div>
+                                <div>Created by: ${userName}</div>
+                            </div>
+
+                            <div class="text-end">
+                                <a href="/tabungan/${tabungan.id}/edit" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-pen"></i> Edit
+                                </a>
+                                <form id="deleteForm-${tabungan.id}" action="/tabungan/${tabungan.id}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger" type="button" onclick="confirmDelete(${tabungan.id})">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+
+        // Live Search functionality
+        searchInput.on('input', function() {
+            clearTimeout(searchTimeout); // Clear previous timeout
+            const searchTerm = $(this).val();
+
+            if (searchTerm.length >= 1 || searchTerm.length === 0) { // Search when 2+ chars or clear search
+                searchTimeout = setTimeout(function() {
+                    $.ajax({
+                        url: "{{ route('tabungan.index') }}",
+                        method: 'GET',
+                        data: {
+                            search: searchTerm,
+                            ajax: true
+                        }, // Pass ajax: true to identify AJAX request
+                        success: function(response) {
+                            tabunganContainer.empty(); // Clear existing cards
+                            if (response.tabungans.length > 0) {
+                                response.tabungans.forEach(function(tabungan) {
+                                    tabunganContainer.append(renderTabunganCard(tabungan));
+                                });
+                            } else {
+                                tabunganContainer.append('<div class="col-12"><p class="text-center">Tidak ada tabungan yang ditemukan.</p></div>');
+                            }
+                            paginationContainer.html(response.pagination); // Update pagination
+
+                            // Re-attach event listeners for newly rendered buttons
+                            attachModalEventListeners();
+                        },
+                        error: function(xhr) {
+                            console.error('Error during live search:', xhr.responseText);
+                            alert('Failed to fetch search results.');
+                        }
+                    });
+                }, 0); // 500ms delay
+            }
         });
 
-        // Tombol kecil langsung tambah/tarik saldo
-        $('.add-saldo-btn').click(function() {
-            const button = $(this);
-            const id = button.data('id');
-            const input = button.closest('.input-group').find('.add-saldo-input');
-            const amount = parseFloat(input.val());
-            const dompetId = $('#dompet').val();
-
-            if (isNaN(amount) || amount <= 0) {
-                alert('Masukkan nominal yang valid');
-                return;
-            }
-
-            const isWithdraw = button.hasClass('btn-danger');
-            const url = isWithdraw ? '/tabungan/' + id + '/withdraw-saldo' : '/tabungan/' + id + '/add-saldo';
-            const action = isWithdraw ? 'menarik' : 'menambahkan';
+        // Pagination links for AJAX
+        $(document).on('click', '.pagination a.page-link', function(e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            const searchTerm = searchInput.val();
 
             $.ajax({
                 url: url,
-                method: 'POST',
+                method: 'GET',
                 data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    amount: amount,
-                    dompet_id: dompetId
-
+                    search: searchTerm,
+                    ajax: true
                 },
                 success: function(response) {
-                    if (response.error) {
-                        alert(response.message);
-                        return;
-                    }
+                    tabunganContainer.empty();
+                    response.tabungans.forEach(function(tabungan) {
+                        tabunganContainer.append(renderTabunganCard(tabungan));
+                    });
+                    paginationContainer.html(response.pagination);
 
-                    // Update saldo dan progress
-                    $('#saldo-' + id).text('Rp ' + response.saldo_formatted);
-                    const progressBar = $('[data-id="' + id + '"]').find('.progress-bar');
+                    // Re-attach event listeners for newly rendered buttons
+                    attachModalEventListeners();
+                },
+                error: function(xhr) {
+                    console.error('Error during pagination:', xhr.responseText);
+                    alert('Failed to load pagination results.');
+                }
+            });
+        });
+
+
+        // Original modal functionality (ensure it still works for new cards)
+        function attachModalEventListeners() {
+            $('[data-toggle="modal"][data-target="#modalSaldo"]').off('click').on('click', function(event) {
+                const button = $(event.currentTarget); // Use currentTarget to get the element that triggered the event
+                const id = button.data('id');
+                const nama = button.data('nama');
+                const action = button.data('action'); // "add" or "withdraw"
+
+                $('#tabunganId').val(id);
+
+                if (action === 'add') {
+                    $('#modalSaldoTitle').text('Tambah Saldo ke ' + nama);
+                    $('#formSaldo').attr('action', '/tabungan/' + id + '/add-saldo');
+                    $('#submitButton').text('Tambah').removeClass('btn-danger').addClass('btn-primary');
+                    $('#labelDompet').text('Dari Dompet');
+                } else {
+                    $('#modalSaldoTitle').text('Tarik Saldo dari ' + nama);
+                    $('#formSaldo').attr('action', '/tabungan/' + id + '/withdraw-saldo');
+                    $('#submitButton').text('Tarik').removeClass('btn-primary').addClass('btn-danger');
+                    $('#labelDompet').text('Ke Dompet');
+                }
+                // Show the modal manually as data-toggle might not work perfectly with dynamically loaded content
+                $('#modalSaldo').modal('show');
+            });
+        }
+
+        // Call initially to attach listeners to existing buttons
+        attachModalEventListeners();
+
+
+        // Submit form tambah/tarik saldo (stays mostly the same, but will trigger a reload after success)
+        $('#formSaldo').submit(function(e) {
+            e.preventDefault();
+            const url = $(this).attr('action');
+            const formData = $(this).serialize(); // Serialize all form data
+
+            $.post(url, formData, function(response) {
+                if (response.error) {
+                    alert(response.message);
+                } else {
+                    // Update the specific saldo and progress bar without full reload
+                    const tabunganId = $('#tabunganId').val();
+                    $('#saldo-' + tabunganId).text(response.saldo_formatted);
+                    const progressBar = $('[data-id="' + tabunganId + '"]').find('.progress-bar');
                     const newProgress = Math.min(100, (response.saldo / response.target) * 100);
                     progressBar.css('width', newProgress + '%');
                     progressBar.attr('aria-valuenow', newProgress);
                     progressBar.find('.sr-only').text(newProgress.toFixed(0) + '% Complete');
 
-                    // Reflow efek
-                    const progressBarParent = progressBar.parent();
-                    progressBarParent.css('opacity', '0.99');
-                    setTimeout(() => progressBarParent.css('opacity', '1'), 10);
-
-                    input.val('');
-                    alert('Berhasil ' + action + ' saldo!');
-                },
-                error: function(xhr) {
-                    console.error('Error:', xhr.responseText);
-                    try {
-                        const error = JSON.parse(xhr.responseText);
-                        alert(error.message || 'Gagal ' + action + ' saldo');
-                    } catch (e) {
-                        alert('Gagal ' + action + ' saldo. Error: ' + xhr.status + ' ' + xhr.statusText);
-                    }
+                    // Close the modal
+                    $('#modalSaldo').modal('hide');
+                    alert(response.message); // Show success message
+                }
+            }).fail(function(xhr) {
+                console.error('Error processing saldo:', xhr.responseText);
+                try {
+                    const error = JSON.parse(xhr.responseText);
+                    alert(error.message || 'Gagal memproses saldo');
+                } catch (e) {
+                    alert('Gagal memproses saldo. Error: ' + xhr.status + ' ' + xhr.statusText);
                 }
             });
         });
+
+        // Confirm delete function (make sure it's accessible globally or correctly scoped)
+        window.confirmDelete = function(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus tabungan ini?')) {
+                $(`#deleteForm-${id}`).submit();
+            }
+        };
     });
 </script>
 @endsection
