@@ -43,8 +43,8 @@
         <div class="page-wrapper">
             @yield('content')
             <footer class="footer text-center text-muted">
-                All Rights Reserved by Finance Web. Designed and Developed by
-                <a href="https://wrappixel.com">WrapPixel</a>.
+                 © 2025 Finance Web. Dirancang & Dikembangkan oleh Tim Kami —
+                <a href="https://chat.whatsapp.com/CdaT7f4nd0lFfWcwH66FDv">Grup</a>.
             </footer>
         </div>
     </div>
