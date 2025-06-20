@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dompet;
 use App\Models\Transaksi;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -13,15 +14,24 @@ class DompetController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $dompets = $user->dompets()->latest()->get();
+        $dompets = Dompet::where('user_id', $user->id)
+            ->latest()
+            ->get();
 
-        $recentTransactions = Transaksi::with('dompet', 'kategori')
+        $recentTransactions = Transaksi::with(['dompet', 'kategori'])
             ->whereHas('dompet', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
             ->latest()
             ->take(5)
             ->get();
+
+        // For transactions without kategori, set a default type
+        $recentTransactions->each(function ($transaction) {
+            if (!$transaction->kategori) {
+                $transaction->setAttribute('kategori', (object)['tipe' => $transaction->tipe]);
+            }
+        });
 
         return view('dompet.index', [
             'dompets' => $dompets,
@@ -47,11 +57,35 @@ class DompetController extends Controller
             'saldo' => 'nullable|numeric',
         ]);
 
-        Dompet::create([
+        // Create dompet
+        $dompet = Dompet::create([
             'user_id' => Auth::id(),
             'nama' => $request->nama,
             'saldo' => $request->saldo
         ]);
+
+        // Create transaction if saldo is provided
+        if ($request->saldo > 0) {
+            // Get or create a default category for initial balance
+            $defaultCategory = Kategori::firstOrCreate([
+                'nama' => 'Initial Balance',
+                'tipe' => 'pemasukan',
+                'id_user' => Auth::id(),
+            ]);
+
+            // Create transaction with proper tipe and kategori
+            $transaction = Transaksi::create([
+                'user_id' => Auth::id(),
+                'dompet_id' => $dompet->id,
+                'nominal' => $request->saldo,
+                'tipe' => 'pemasukan', // Use the database enum value directly
+                'kategori_id' => $defaultCategory->id,
+                'keterangan' => 'Pembuatan dompet baru: ' . $request->nama,
+            ]);
+
+            // Force reload the transaction with relationships
+            $transaction->load('kategori');
+        }
 
         return redirect()->route('dompet.index')->with('success', 'Dompet Berhasil ditambahkan');
     }
@@ -72,7 +106,34 @@ class DompetController extends Controller
             'saldo' => 'nullable|numeric',
         ]);
 
+        // Calculate saldo difference
+        $saldoDifference = $request->saldo - $dompet->saldo;
+
+        // Update dompet
         $dompet->update($request->only(['user_id', 'nama', 'saldo']));
+
+        // Create transaction if saldo has changed
+        if ($saldoDifference != 0) {
+            // Get or create a default category for balance changes
+            $defaultCategory = Kategori::firstOrCreate([
+                'nama' => 'Balance Change',
+                'tipe' => $saldoDifference > 0 ? 'pemasukan' : 'pengeluaran',
+                'id_user' => Auth::id(),
+            ]);
+
+            // Create transaction with proper tipe and kategori
+            $transaction = Transaksi::create([
+                'user_id' => Auth::id(),
+                'dompet_id' => $dompet->id,
+                'nominal' => abs($saldoDifference),
+                'tipe' => $saldoDifference > 0 ? 'pemasukan' : 'pengeluaran', // Use the database enum value directly
+                'kategori_id' => $defaultCategory->id,
+                'keterangan' => 'Perubahan saldo dompet: ' . $request->nama,
+            ]);
+
+            // Force reload the transaction with relationships
+            $transaction->load('kategori');
+        }
 
         return redirect()->route('dompet.index')->with('success', 'Berhasil diperbarui');
     }

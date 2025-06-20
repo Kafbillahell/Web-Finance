@@ -65,6 +65,14 @@
         font-size: 0.75rem;
     }
 
+    .transaction-wallet {
+        display: inline-block;
+        margin-top: 0.25rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+    }
+
     .transaction-amount {
         font-weight: 700;
         font-size: 1.125rem;
@@ -98,7 +106,7 @@
         color: #065F46;
     }
 
-    .transaction-dompet {
+    .wallet {
         font-size: 0.875rem;
         color: #6B7280;
         background-color: #F9FAFB;
@@ -127,14 +135,17 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                
+
                 <h3 class="header-title">Transaksi Tabungan ({{ $transaksis->count() }})</h3>
                 @forelse ($transaksis as $transaksi)
                 <div class="transaction-card" data-toggle="modal" data-target="#modalTransaksi{{ $transaksi->id }}">
                     <div class="transaction-info">
                         <span class="transaction-date">{{ $transaksi->created_at->format('M d, Y') }}</span>
-                        <span class="transaction-desc">{{ $transaksi->dompet->nama }}, {{ $transaksi->keterangan }}</span>
-                        <span class="transaction-category uppercase {{ $transaksi->tipe === 'deposit' ? 'category-income' : 'category-expense' }}"> {{ $transaksi->tipe }}</span>
+                        <span class="transaction-desc">{{ $transaksi->tabungan->nama }}, {{ $transaksi->keterangan }}</span>
+                        <div class="column">
+                            <span class="transaction-category uppercase {{ $transaksi->tipe === 'deposit' ? 'category-income' : 'category-expense' }}"> {{ $transaksi->tipe }}</span>
+                            <span class="transaction-wallet uppercase wallet "> {{ $transaksi->dompet->nama}}</span>
+                        </div>
                     </div>
                     <div class="transaction-amount {{ $transaksi->tipe === 'deposit' ? 'amount-income' : 'amount-expense' }}">
                         {{ $transaksi->tipe === 'deposit' ? '+' : '-' }} Rp {{ number_format($transaksi->nominal, 2, ',', '.') }}

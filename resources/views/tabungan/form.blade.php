@@ -47,6 +47,23 @@
                         </div>
 
                         <div class="form-group row">
+                            <label for="dompet_id" class="col-sm-2 col-form-label">Awal Saldo Ambil dari</label>
+                            <div class="col-sm-10">
+                                <select name="dompet_id" id="dompet_id" class="form-control @error('dompet_id') is-invalid @enderror" required>
+                                    <option value="">Pilih Dompet</option>
+                                    @foreach($dompets as $dompet)
+                                        <option value="{{ $dompet->id }}" {{ isset($tabungan) && $tabungan->dompet_id == $dompet->id ? 'selected' : '' }}>
+                                            {{ $dompet->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('dompet_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
                             <div class="col-sm-10 offset-sm-2">
                                 <button type="submit" class="btn btn-primary">
                                     {{ isset($tabungan) ? 'Update Tabungan' : 'Create Tabungan' }}
