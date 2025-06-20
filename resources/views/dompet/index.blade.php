@@ -175,10 +175,17 @@
                 <div class="row g-3">
                     @php
                     $cardClasses = ['wallet-card', 'wallet-card wallet-card-blue', 'wallet-card wallet-card-green', 'wallet-card wallet-card-orange', 'wallet-card wallet-card-pink'];
-                    @endphp                
+                    @endphp
                     @forelse($dompet_terpilih ?? [] as $index => $dompet)
                     <div class="col-12">
                         <div class="{{ $cardClasses[($index + 1) % count($cardClasses)] }}" onclick="showTransactions('{{ $dompet->id }}')" data-wallet-id="{{ $dompet->id }}">
+                            <form id="deleteForm-{{ $dompet->id }}" method="POST" action="{{ route('dompet.destroy', $dompet->id) }}" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="confirmDelete({{ $dompet->id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                             <div class="wallet-balance">Rp {{ number_format($dompet->saldo ?? 0, 0, ',', '.') }}</div>
                             <div class="wallet-name">{{ $dompet->nama ?? 'Wallet Name' }}</div>
                             <div class="mt-2">
