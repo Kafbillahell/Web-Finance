@@ -51,9 +51,9 @@ class TabunganController extends Controller
     public function history(Request $request)
     {
         $query = TransaksiTabungan::with(['tabungan', 'dompet'])
-                    ->whereHas('tabungan', function ($q) {
-                        $q->where('user_id', Auth::id());
-                    });
+            ->whereHas('tabungan', function ($q) {
+                $q->where('user_id', Auth::id());
+            });
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -89,8 +89,8 @@ class TabunganController extends Controller
 
         try {
             $dompet = Dompet::where('id', $validatedData['dompet_id'])
-                            ->where('user_id', Auth::id())
-                            ->firstOrFail();
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
 
             if ($dompet->saldo < $validatedData['saldo']) {
                 DB::rollBack();
@@ -118,7 +118,6 @@ class TabunganController extends Controller
             DB::commit();
 
             return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan dan saldo dompet telah diperbarui.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menambahkan tabungan. ' . $e->getMessage())->withInput();
@@ -156,12 +155,12 @@ class TabunganController extends Controller
             $oldDompetId = $tabungan->dompet_id;
 
             $currentDompet = Dompet::where('id', $oldDompetId)
-                                   ->where('user_id', Auth::id())
-                                   ->firstOrFail();
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
 
             $newDompet = Dompet::where('id', $validatedData['dompet_id'])
-                               ->where('user_id', Auth::id())
-                               ->firstOrFail();
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
 
             if ($oldDompetId != $validatedData['dompet_id']) {
                 $currentDompet->saldo += $oldSaldo;
@@ -190,7 +189,6 @@ class TabunganController extends Controller
                     'tipe'        => TransaksiTabungan::TYPE_DEPOSIT,
                     'keterangan'  => 'Penambahan saldo ke tabungan dari dompet baru karena perubahan dompet.',
                 ]);
-
             } else {
                 $saldoDifference = $validatedData['saldo'] - $oldSaldo;
 
@@ -231,7 +229,6 @@ class TabunganController extends Controller
             DB::commit();
 
             return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil diperbarui dan saldo dompet telah disesuaikan.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal memperbarui tabungan. ' . $e->getMessage())->withInput();
@@ -240,48 +237,55 @@ class TabunganController extends Controller
 
     public function destroy(Tabungan $tabungan)
     {
+        // Pastikan hanya pemilik yang bisa hapus
         if ($tabungan->user_id !== Auth::id()) {
             return back()->with('error', 'Anda tidak memiliki akses untuk menghapus tabungan ini.');
         }
 
         DB::beginTransaction();
         try {
+            // Ambil transaksi deposit terakhir (bukan withdrawal atau return)
             $lastDeposit = TransaksiTabungan::where('tabungan_id', $tabungan->id)
-                                             ->where('tipe', TransaksiTabungan::TYPE_DEPOSIT)
-                                             ->latest()
-                                             ->first();
+                ->where('tipe', TransaksiTabungan::TYPE_DEPOSIT)
+                ->latest()
+                ->first();
 
             if ($tabungan->saldo > 0 && $lastDeposit && $lastDeposit->dompet_id) {
                 $dompet = Dompet::where('id', $lastDeposit->dompet_id)
-                                 ->where('user_id', Auth::id())
-                                 ->first();
+                    ->where('user_id', Auth::id())
+                    ->first();
+
                 if ($dompet) {
+                    // Kembalikan saldo ke dompet
                     $dompet->saldo += $tabungan->saldo;
                     $dompet->save();
 
+                    // Catat transaksi pengembalian
                     TransaksiTabungan::create([
                         'tabungan_id' => $tabungan->id,
                         'dompet_id'   => $dompet->id,
                         'nominal'     => $tabungan->saldo,
-                        'tipe'        => TransaksiTabungan::TYPE_RETURN,
-                        'keterangan'  => 'Pengembalian saldo dari penutupan tabungan: ' . $tabungan->nama,
+                        'tipe'        => 'return', // Pastikan kamu punya konstanta TYPE_RETURN jika mau
+                        'keterangan'  => 'Pengembalian saldo dari penghapusan tabungan: ' . $tabungan->nama,
                     ]);
                 }
             }
 
+            // Hapus semua transaksi tabungan
             TransaksiTabungan::where('tabungan_id', $tabungan->id)->delete();
 
+            // Hapus tabungan
             $tabungan->delete();
 
             DB::commit();
 
             return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil dihapus dan saldo telah dikembalikan.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menghapus tabungan. ' . $e->getMessage());
         }
     }
+
 
     public function addSaldo(Request $request, $id)
     {
