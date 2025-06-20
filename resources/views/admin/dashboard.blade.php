@@ -49,7 +49,7 @@
         @endforeach
     </div>
 
-    <div class="row mt-4">
+    <div class="row mt-4 mb-4">
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-body">
@@ -58,12 +58,14 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="card">
+        <div class="col-lg-6 ">
+            <div class="card h-100">
                 <div class="card-body">
                     <h4 class="card-title">Kategori Pengeluaran</h4>
                     <div id="admin-kategori-data" data-json='@json($adminKategoriChart)'></div>
-                    <canvas id="adminPieChart" height="300"></canvas>
+                    <div class="mt-3">
+                        <canvas id="adminPieChart" height="250"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -130,45 +132,61 @@
             resize: true
         });
 
-        // Pie Chart dengan Chart.js
-        const pieData = JSON.parse(document.getElementById('admin-kategori-data').dataset.json);
-
+        // Initialize pie chart
         const ctx = document.getElementById('adminPieChart').getContext('2d');
-
-        new Chart(ctx, {
+        const adminKategoriData = JSON.parse(document.getElementById('admin-kategori-data').dataset.json);
+        
+        const pieChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: pieData.map(item => item.nama),
+                labels: adminKategoriData.map(item => item.nama),
                 datasets: [{
-                    label: 'Kategori Pengeluaran',
-                    data: pieData.map(item => item.total_nominal),
+                    data: adminKategoriData.map(item => parseFloat(item.total_nominal)),
                     backgroundColor: [
-                        '#5f76e8', '#ff4f70', '#01caf1', '#ffc107', '#4caf50', '#9c27b0', '#795548'
-                    ],
-                    borderWidth: 1
+                        '#00c292', '#f44336', '#2196f3', '#9c27b0', '#ff9800',
+                        '#03a9f4', '#4caf50', '#e91e63', '#3f51b5', '#2196f3'
+                    ]
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
                 plugins: {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            boxWidth: 20
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                let value = context.parsed || 0;
-                                return `${label}: Rp${value.toLocaleString('id-ID')}`;
+                            font: {
+                                size: 10
                             }
                         }
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 20,
+                        left: 20,
+                        right: 20
                     }
                 }
             }
         });
+
+        // Update chart size based on container
+        function updateChartSize() {
+            const container = document.querySelector('.card-body');
+            if (container) {
+                const width = container.clientWidth;
+                pieChart.canvas.width = width;
+                pieChart.canvas.height = width * 0.7; // 70% of width
+                pieChart.update();
+            }
+        }
+
+        // Add resize listener
+        window.addEventListener('resize', updateChartSize);
+        updateChartSize();
     });
 </script>
 @endif

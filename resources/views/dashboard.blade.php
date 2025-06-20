@@ -133,105 +133,105 @@
                 </div>
             </div>
         </div>
-       <div class="col-lg-8 col-md-12">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">Bar Chart</h4>
-            <div id="morris-bar-chart" style="height: 300px;"></div>
-        </div>
-    </div>
-</div>
-
-
-    <div class="row mt-4">
-        <div class="col-12">
+        <div class="col-lg-8 col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="card-title mb-0">Recent Transactions</h4>
-                        <div>
-                            <a href="{{ route('transaksi.index') }}" class="btn btn-primary btn-sm me-2">
-                                View All Transactions
-                            </a>
-                            <a href=" {{ route ('export.transaksi', 'recent')  }}" class="btn btn-primary btn-sm">
-                                Export Transactions
-                            </a>
-                        </div>
-                    </div>
-
-                    @if($recentTransactions->isEmpty())
-                    <div class="text-center py-4">
-                        <i class="fas fa-exchange-alt display-1 mb-3 text-muted"></i>
-                        <p class="mb-0">No recent transactions</p>
-                    </div>
-                    @else
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th>Dompet</th>
-                                    <th>Kategori</th>
-                                    <th>Tipe</th>
-                                    <th>Nominal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($recentTransactions as $transaction)
-                                <tr>
-                                    <td>{{ $transaction->created_at->format('d/m/Y H:i') }}</td>
-                                    <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
-                                    <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $transaction->kategori->tipe   === 'pemasukan' ? 'success' : 'danger' }}">
-                                            {{ ucfirst($transaction->kategori->tipe) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-bold text-{{ $transaction->kategori->tipe === 'pemasukan' ? 'success' : 'danger' }}">
-                                            Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @endif
+                    <h4 class="card-title">Bar Chart</h4>
+                    <div id="morris-bar-chart" style="height: 300px;"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    @if($dompet->isEmpty())
-    <div class="card text-center py-5">
-        <div class="card-body">
-            <i class="fas fa-clipboard fa-4x text-muted mb-3"></i>
-            <h5 class="card-title">You do not have any wallets yet.</h5>
-            <a href="{{ route('dompet.create') }}" class="btn btn-primary mt-3">Buat Dompet Baru</a>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="card-title mb-0">Recent Transactions</h4>
+                            <div>
+                                <a href="{{ route('transaksi.index') }}" class="btn btn-primary btn-sm me-2">
+                                    View All Transactions
+                                </a>
+                                <a href=" {{ route ('export.transaksi', 'recent')  }}" class="btn btn-primary btn-sm">
+                                    Export Transactions
+                                </a>
+                            </div>
+                        </div>
+
+                        @if($recentTransactions->isEmpty())
+                        <div class="text-center py-4">
+                            <i class="fas fa-exchange-alt display-1 mb-3 text-muted"></i>
+                            <p class="mb-0">No recent transactions</p>
+                        </div>
+                        @else
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Dompet</th>
+                                        <th>Kategori</th>
+                                        <th>Tipe</th>
+                                        <th>Nominal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentTransactions as $transaction)
+                                    <tr>
+                                        <td>{{ $transaction->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>{{ $transaction->dompet->nama ?? 'N/A' }}</td>
+                                        <td>{{ $transaction->kategori->nama ?? 'N/A' }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $transaction->kategori->tipe   === 'pemasukan' ? 'success' : 'danger' }}">
+                                                {{ ucfirst($transaction->kategori->tipe) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-{{ $transaction->kategori->tipe === 'pemasukan' ? 'success' : 'danger' }}">
+                                                Rp {{ $transaction->nominal ? number_format($transaction->nominal, 0, ',', '.') : 'N/A' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
+
+        @if($dompet->isEmpty())
+        <div class="card text-center py-5">
+            <div class="card-body">
+                <i class="fas fa-clipboard fa-4x text-muted mb-3"></i>
+                <h5 class="card-title">You do not have any wallets yet.</h5>
+                <a href="{{ route('dompet.create') }}" class="btn btn-primary mt-3">Buat Dompet Baru</a>
+            </div>
+        </div>
+        @endif
     </div>
     @endif
-</div>
-@endif
-@endsection
+    @endsection
 
-@section('scripts')
-<script src="{{asset('assets')}}/js/feather.min.js"></script>
-<script src="{{asset('assets')}}/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
-<script src="{{asset('assets')}}/js/sidebarmenu.js"></script>
-<!--Custom JavaScript -->
-<script src="{{asset('assets')}}/js/custom.min.js"></script>
-<!--This page JavaScript -->
-<script src="{{asset('assets')}}/extra-libs/c3/d3.min.js"></script>
-<script src="{{asset('assets')}}/extra-libs/c3/c3.min.js"></script>
-<script src="{{asset('assets')}}/libs/chartist/dist/chartist.min.js"></script>
-<script src="{{asset('assets')}}/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
-<script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
-<script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
-<script src="{{asset('assets')}}/js/pages/dashboards/dashboard1.min.js"></script>
-<script src="{{asset('assets')}}/libs/raphael/raphael.min.js"></script>
-<script src="{{asset('assets')}}/libs/morris.js/morris.min.js"></script>
-<script src="{{asset('assets')}}/js/pages/morris/morris-data.js"></script>
-<script src="{{asset('assets')}}/js/pages/dashboard/dashboard.js"></script>
-@endsection
+    @section('scripts')
+    <script src="{{asset('assets')}}/js/feather.min.js"></script>
+    <script src="{{asset('assets')}}/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+    <script src="{{asset('assets')}}/js/sidebarmenu.js"></script>
+    <!--Custom JavaScript -->
+    <script src="{{asset('assets')}}/js/custom.min.js"></script>
+    <!--This page JavaScript -->
+    <script src="{{asset('assets')}}/extra-libs/c3/d3.min.js"></script>
+    <script src="{{asset('assets')}}/extra-libs/c3/c3.min.js"></script>
+    <script src="{{asset('assets')}}/libs/chartist/dist/chartist.min.js"></script>
+    <script src="{{asset('assets')}}/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
+    <script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-2.0.2.min.js"></script>
+    <script src="{{asset('assets')}}/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="{{asset('assets')}}/js/pages/dashboards/dashboard1.min.js"></script>
+    <script src="{{asset('assets')}}/libs/raphael/raphael.min.js"></script>
+    <script src="{{asset('assets')}}/libs/morris.js/morris.min.js"></script>
+    <script src="{{asset('assets')}}/js/pages/morris/morris-data.js"></script>
+    <script src="{{asset('assets')}}/js/pages/dashboard/dashboard.js"></script>
+    @endsection

@@ -55,8 +55,6 @@
         font-size: 0.75rem;
     }
 
-    }
-
     .transaction-wallet {
         display: inline-block;
         margin-top: 0.25rem;

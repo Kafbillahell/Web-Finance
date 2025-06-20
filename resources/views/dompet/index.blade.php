@@ -162,7 +162,7 @@
                             <div class="wallet-balance">Rp {{ number_format($dompet->saldo ?? 0, 0, ',', '.') }}</div>
                             <div class="wallet-name">{{ $dompet->nama ?? 'Wallet Name' }}</div>
                             <div class="mt-2">
-                                <form id="deleteForm-{{ $dompet->id }}" method="POST" action="{{ route('dompet.destroy', $dompet->id) }}" class="d-inline">
+                                <form id="deleteForm-{{ $dompet->id }}" method="POST" action="{{ route('dompet.destroy', ['dompet' => $dompet->id]) }}" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="confirmDelete({{ $dompet->id }})">
