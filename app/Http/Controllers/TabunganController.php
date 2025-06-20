@@ -58,32 +58,44 @@ class TabunganController extends Controller
     public function create()
     {
         $users = User::all();
-        return view('tabungan.form', compact('users'));
+        $dompets = Dompet::where('user_id', Auth::id())->get();
+        return view('tabungan.form', compact('users', 'dompets'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-
             'nama'    => 'required|string|max:255',
             'saldo'   => 'required|numeric|min:0',
             'target'  => 'nullable|numeric|min:0',
+            'dompet_id' => 'required|exists:dompets,id',
         ]);
 
-        Tabungan::create([
+        // Create tabungan
+        $tabungan = Tabungan::create([
             'user_id' => Auth::user()->id,
             'nama' => $request->nama,
             'saldo' => $request->saldo,
             'target' => $request->target
         ]);
 
-        return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan.');
+        // Create transaksi tabungan
+        TransaksiTabungan::create([
+            'tabungan_id' => $tabungan->id,
+            'dompet_id' => $request->dompet_id,
+            'nominal' => $request->saldo,
+            'tipe' => TransaksiTabungan::TYPE_DEPOSIT,
+            'keterangan' => 'Pembuatan tabungan baru: ' . $request->nama,
+        ]);
+
+        return redirect()->route('tabungan.index')->with('success', 'Tabungan berhasil ditambahkan dan transaksi berhasil dicatat.');
     }
 
     public function edit(Tabungan $tabungan)
     {
         $users = User::all();
-        return view('tabungan.form', compact('tabungan', 'users'));
+        $dompets = Dompet::where('user_id', Auth::id())->get();
+        return view('tabungan.form', compact('tabungan', 'users', 'dompets'));
     }
 
     public function update(Request $request, Tabungan $tabungan)
@@ -92,8 +104,13 @@ class TabunganController extends Controller
             'nama'    => 'required|string|max:255',
             'saldo'   => 'required|numeric|min:0',
             'target'  => 'nullable|numeric|min:0',
+            'dompet_id' => 'required|exists:dompets,id',
         ]);
 
+        // Calculate the difference in saldo
+        $saldoDifference = $request->saldo - $tabungan->saldo;
+
+        // Update tabungan
         $tabungan->update([
             'user_id' => Auth::id(),
             'nama'    => $request->nama,

@@ -17,7 +17,7 @@
                             <line x1="12" x2="12" y1="2" y2="22"></line>
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                         </svg>
-                        <span class="text-2xl font-bold text-primary">FinDash</span>
+                        <span class="text-2xl font-bold text-primary logo-text">FinDash</span>
                     </div>
                 </a>
             </div>

@@ -78,12 +78,23 @@ class DashboardController extends Controller
             ->sortBy('total_nominal') // 🔁 URUTKAN dari nominal terkecil
             ->values();
 
-        // Get recent transactions
+        // Get recent transactions with proper loading of relationships
         $recentTransactions = Transaksi::with(['dompet', 'kategori'])
             ->where('user_id', $user->id)
             ->latest()
             ->take(5)
-            ->get();
+            ->get()
+            ->each(function ($transaction) {
+                // If transaction has no kategori, create a default one
+                if (!$transaction->kategori) {
+                    $defaultCategory = Kategori::firstOrCreate([
+                        'nama' => 'Uncategorized',
+                        'tipe' => $transaction->tipe,
+                        'id_user' => Auth::id(),
+                    ]);
+                    $transaction->kategori()->associate($defaultCategory);
+                }
+            });
 
         return view('dashboard', compact('user', 'dompet', 'totalSaldo', 'totalPemasukan', 'totalPengeluaran', 'totalTabungan', 'recentTransactions', 'kategoriTransaksi', 'monthlyTotals'));
     }
