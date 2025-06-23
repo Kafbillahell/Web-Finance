@@ -57,11 +57,19 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="nominal" class="form-label">Nominal <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control @error('nominal') is-invalid @enderror" id="nominal"
-                                name="nominal" value="{{ old('nominal', $transaksi->nominal ?? '') }}" required>
+                            <label for="nominalFormatted" class="form-label">
+                                Nominal <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                class="form-control format-saldo @error('nominal') is-invalid @enderror"
+                                id="nominalFormatted"
+                                value="{{ old('nominal', isset($transaksi->nominal) ? number_format($transaksi->nominal, 0, ',', '.') : '') }}"
+                                required>
+                            <input type="hidden" name="nominal"
+                                id="nominal"
+                                value="{{ old('nominal', $transaksi->nominal ?? '') }}">
                             @error('nominal')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -84,8 +92,26 @@
                         </div>
                     </form>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formattedInput = document.getElementById('nominalFormatted');
+        const hiddenInput = document.getElementById('nominal');
+
+        formattedInput.addEventListener('input', function() {
+            let raw = this.value.replace(/\D/g, '');
+            if (raw) {
+                this.value = parseInt(raw).toLocaleString('id-ID');
+            } else {
+                this.value = '';
+            }
+            hiddenInput.value = raw;
+        });
+    });
+</script>
+
 @endsection

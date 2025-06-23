@@ -39,7 +39,6 @@
                                     <th>#</th>
                                     <th>Nama Kategori</th>
                                     <th>Tipe Kategori</th>
-                                    <th>Id User</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>

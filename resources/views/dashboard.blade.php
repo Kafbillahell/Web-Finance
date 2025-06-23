@@ -91,7 +91,8 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="{{ $type }}Amount" class="form-label">Jumlah {{ ucfirst($type) }}</label>
-                        <input type="number" name="amount" id="{{ $type }}Amount" class="form-control" min="1" step="0.01" placeholder="Misal: 50000" required>
+                        <input type="text" id="{{ $type }}AmountFormatted" class="form-control format-saldo" placeholder="Misal: 50.000" required>
+                        <input type="hidden" name="amount" id="{{ $type }}Amount">
                     </div>
                     <div class="mb-3">
                         <label for="dompet_id_{{ $type }}" class="form-label">Pilih Dompet</label>
@@ -214,6 +215,30 @@
         @endif
     </div>
     @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formatInputs = document.querySelectorAll('.format-saldo');
+
+            formatInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    let value = this.value.replace(/\D/g, '');
+                    if (value) {
+                        this.value = parseInt(value).toLocaleString('id-ID');
+                    } else {
+                        this.value = '';
+                    }
+
+                    // Update hidden input
+                    const targetHiddenId = this.id.replace('Formatted', '');
+                    const hiddenInput = document.getElementById(targetHiddenId);
+                    if (hiddenInput) {
+                        hiddenInput.value = value;
+                    }
+                });
+            });
+        });
+    </script>
+
     @endsection
 
     @section('scripts')
