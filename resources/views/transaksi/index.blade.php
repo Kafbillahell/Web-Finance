@@ -108,11 +108,16 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Transaksi List</h4>
-                        <div class="d-flex justify-content-end mb-3">
+                        <div class="d-flex justify-content-end mb-3 gap-2">
                             <a href="{{ route('export.transaksi', 'all') }}" class="btn btn-primary btn-sm">
-                                Export Transactions
+                                Export Excel
+                            </a>
+                            <a href="{{ route('transaksi.export.pdf', 'all') }}" class="btn btn-danger btn-sm"
+                                target="_blank">
+                                Export PDF
                             </a>
                         </div>
+
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>
@@ -136,7 +141,7 @@
                                             <td>
                                                 <span
                                                     class="badge px-3 py-2 rounded-pill 
-                                                     {{ $trx->kategori && $trx->kategori->tipe === 'pemasukan' ? 'bg-success text-white' : 'bg-danger text-white' }}">
+                                                             {{ $trx->kategori && $trx->kategori->tipe === 'pemasukan' ? 'bg-success text-white' : 'bg-danger text-white' }}">
                                                     {{ ucfirst($trx->kategori->tipe ?? '-') }}
                                                 </span>
                                             </td>
