@@ -48,6 +48,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/dompet/{id}/withdraw', [DompetController::class, 'withdraw'])->name('dompet.withdraw');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
     Route::get('/export/transaksi/{type}', [TransaksiController::class, 'exportTransaksi'])->name('export.transaksi');
+    Route::get('/transaksi/export/pdf/{type?}', [TransaksiController::class, 'exportPdf'])->name('transaksi.export.pdf');
+   Route::get('/transaksi/pdf', [TransaksiController::class, 'exportPdf'])->name('transaksi.pdf');
 
 });
 

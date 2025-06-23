@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PDF;
 
 class TransaksiExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize
 {
@@ -90,4 +91,5 @@ class TransaksiExport implements FromCollection, WithHeadings, WithStyles, Shoul
 
         return [];
     }
+    
 }
