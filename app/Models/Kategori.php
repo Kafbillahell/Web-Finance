@@ -14,15 +14,16 @@ class Kategori extends Model
     protected $fillable = [
         'nama',
         'tipe',
+        'id_user',
     ];
 
-    public function pemasukan()
+    public function transaksi()
     {
-        return $this->hasMany(Pemasukan::class);
+        return $this->hasMany(Transaksi::class, 'kategori_id');
     }
-
-    public function pengeluaran()
+    
+    public function user()
     {
-        return $this->hasMany(Pengeluaran::class);
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

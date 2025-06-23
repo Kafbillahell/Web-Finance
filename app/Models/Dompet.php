@@ -5,8 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
-use App\Models\Pemasukan;
-use App\Models\Pengeluaran;
 
 class Dompet extends Model
 {
@@ -19,13 +17,14 @@ class Dompet extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function pemasukan()
+
+    public function transaksi()
     {
-        return $this->hasMany(Pemasukan::class);
+        return $this->hasMany(Transaksi::class);
     }
 
-    public function pengeluaran()
+    public function history()
     {
-        return $this->hasMany(Pengeluaran::class);
+        return $this->hasMany(TransaksiTabungan::class);
     }
 }

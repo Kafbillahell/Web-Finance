@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Tabungan extends Model
 {
@@ -20,5 +21,10 @@ class Tabungan extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function transaksi()
+    {
+        return $this->hasMany(TransaksiTabungan::class);
     }
 }
