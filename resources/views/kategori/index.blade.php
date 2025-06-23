@@ -9,7 +9,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
                         <li class="breadcrumb-item active" aria-current="page">Home</li>
-                        <li class="breadcrumb-item active" aria-current="page">Kategori</li>       
+                        <li class="breadcrumb-item active" aria-current="page">Kategori</li>
                     </ol>
                 </nav>
             </div>
@@ -27,11 +27,11 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    
+
 
                     <h4 class="card-title">Daftar Kategori</h4>
 
-                    
+
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -39,7 +39,6 @@
                                     <th>#</th>
                                     <th>Nama Kategori</th>
                                     <th>Tipe Kategori</th>
-                                    <th>Id User</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -55,11 +54,14 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="btn-group" role="group">
+                                        <div class="d-flex gap-1">
                                             <a href="{{ url("kategori/$row->id/edit") }}" class="btn btn-warning btn-sm">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form id="deleteForm-{{ $row->id }}" method="POST" action="{{ route('kategori.destroy', $row->id) }}" class="d-inline" onsubmit="return confirm('Are you sure?')">
+                                            <a href="{{ route('kategori.detail', $row->id) }}" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <form id="deleteForm-{{ $row->id }}" method="POST" action="{{ route('kategori.destroy', $row->id) }}" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $row->id }})">

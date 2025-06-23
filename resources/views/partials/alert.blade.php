@@ -4,42 +4,50 @@
 <script>
     // Flash messages
     @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: "{{ session('success') }}",
-            timer: 2000,
-            showConfirmButton: false
-        });
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: "{{ session('success') }}",
+        timer: 2000,
+        showConfirmButton: false
+    });
     @elseif(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: "{{ session('error') }}"
+    });
+    @elseif(session('warning'))
+    Swal.fire({
+        icon: 'warning',
+        title: 'Peringatan!',
+        text: "{{ session('warning') }}"
+    });
+    @endif
+
+    @if ($errors->any()) 
         Swal.fire({
             icon: 'error',
-            title: 'Gagal!',
-            text: "{{ session('error') }}"
-        });
-    @elseif(session('warning'))
-        Swal.fire({
-            icon: 'warning',
-            title: 'Peringatan!',
-            text: "{{ session('warning') }}"
+            title: 'Validasi Gagal!',
+            html: `{!! implode('<br>', $errors->all()) !!}`
         });
     @endif
 
-    // Konfirmasi hapus
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Yakin ingin menghapus?',
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#e3342f',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteForm-' + id).submit();
-            }
-        });
-    }
+// Konfirmasi hapus
+function confirmDelete(id) {
+Swal.fire({
+title: 'Yakin ingin menghapus?',
+text: "Data yang dihapus tidak dapat dikembalikan!",
+icon: 'warning',
+showCancelButton: true,
+confirmButtonColor: '#e3342f',
+cancelButtonColor: '#6c757d',
+confirmButtonText: 'Ya, hapus!',
+cancelButtonText: 'Batal'
+}).then((result) => {
+if (result.isConfirmed) {
+document.getElementById('deleteForm-' + id).submit();
+}
+});
+}
 </script>

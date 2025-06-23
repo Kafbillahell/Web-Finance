@@ -270,7 +270,8 @@
                     <input type="hidden" name="tabungan_id" id="tabunganId">
                     <div class="mb-3">
                         <label for="amount" class="form-label">Jumlah Saldo</label>
-                        <input type="number" class="form-control" name="amount" id="amount" required min="1">
+                        <input type="text" class="form-control" id="amountFormatted" placeholder="Misal: 100.000" required>
+                        <input type="hidden" name="amount" id="amount">
                     </div>
                     <div class="mb-3">
                         <label for="dompet" class="form-label" id="labelDompet">Dari/Ke Dompet</label>
@@ -291,6 +292,25 @@
 @endsection
 @section('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputFormatted = document.getElementById('amountFormatted');
+        const inputHidden = document.getElementById('amount');
+
+        inputFormatted.addEventListener('input', function() {
+            // Ambil angka mentah (tanpa karakter selain digit)
+            let rawValue = this.value.replace(/\D/g, '');
+
+            // Format tampilan jika ada angka
+            if (rawValue) {
+                this.value = parseInt(rawValue).toLocaleString('id-ID');
+            } else {
+                this.value = '';
+            }
+
+            // Set nilai hidden input (tanpa titik)
+            inputHidden.value = rawValue;
+        });
+    });
     $(document).ready(function() {
         let searchTimeout;
         const searchInput = $('#liveSearchInput');
@@ -610,6 +630,8 @@
                 }
             });
         });
+
+
 
         // --- Confirm delete function ---
         // window.confirmDelete = function(id) {
