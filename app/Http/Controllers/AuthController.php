@@ -39,7 +39,7 @@ class AuthController extends Controller
                 return redirect('dashboard');  // Halaman kasir
             }
 
-            abort(403, 'Unauthorized role.');
+            return view('error', ['code' => 403, 'message' => 'Unauthorized role.']);
         }
 
         return back()->with('message', 'Login gagal. Periksa kembali email atau password.');
