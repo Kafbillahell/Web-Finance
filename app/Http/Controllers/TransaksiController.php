@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Transaksi;
 use App\Models\Dompet;
 use App\Models\Kategori;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TransaksiExport;
+
 
 class TransaksiController extends Controller
 {
@@ -23,7 +25,7 @@ class TransaksiController extends Controller
         // Calculate monthly totals
         $monthlyTotals = [];
         $currentYear = now()->year;
-        
+
         // Get all transactions for the current year
         $allTransactions = Transaksi::where('user_id', Auth::id())
             ->whereYear('created_at', $currentYear)
@@ -31,13 +33,13 @@ class TransaksiController extends Controller
 
         for ($month = 1; $month <= 12; $month++) {
             // Filter transactions by month
-            $monthTransactions = $allTransactions->filter(function($trx) use ($month) {
+            $monthTransactions = $allTransactions->filter(function ($trx) use ($month) {
                 return $trx->created_at->month === $month;
             });
 
             $income = $monthTransactions->where('tipe', 'pemasukan')
                 ->sum('nominal');
-            
+
             $expense = $monthTransactions->where('tipe', 'pengeluaran')
                 ->sum('nominal');
 
@@ -82,9 +84,9 @@ class TransaksiController extends Controller
         $kategori = Kategori::findOrFail($request->kategori_id);
         $tipe = $kategori->tipe;
 
-        
+
         $dompet = Dompet::findOrFail($request->dompet_id);
-        
+
         if ($tipe === 'pengeluaran') {
             if ($dompet->saldo < $request->nominal) {
                 return back()->with('error', 'Saldo tidak mencukupi untuk transaksi ini.');
@@ -145,6 +147,34 @@ class TransaksiController extends Controller
 
     public function exportTransaksi($type)
     {
-        return Excel::download(new TransaksiExport($type), 'transaksi-'.$type.'.xlsx');
+        return Excel::download(new TransaksiExport($type), 'transaksi-' . $type . '.xlsx');
+    }
+
+    public function show($id)
+{
+    $transaksi = Transaksi::findOrFail($id);
+    return view('transaksi.show', compact('transaksi'));
+}
+
+
+  public function exportPdf($type = 'all')
+    {
+        $transaksis = Transaksi::with(['kategori', 'dompet'])
+            ->orderBy('created_at', 'desc')
+            ->when($type === 'recent', fn($query) => $query->limit(5))
+            ->get();
+
+        $pdf = Pdf::loadView('exports.transaksi_pdf', [
+            'transaksis' => $transaksis,
+            'type' => $type,
+        ])->setPaper('A4', 'portrait');
+
+        $filename = $type === 'recent' ? 'laporan-transaksi-recent.pdf' : 'laporan-transaksi-all.pdf';
+
+        return $pdf->download($filename);
     }
 }
+
+
+    
+

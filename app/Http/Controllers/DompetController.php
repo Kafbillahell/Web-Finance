@@ -37,7 +37,6 @@ class DompetController extends Controller
             'dompets' => $dompets,
             'total_dompet' => $dompets->count(),
             'total_saldo' => $dompets->sum('saldo'),
-            'jenis_dompet' => $dompets->pluck('nama')->unique()->count(),
             'dompet_terpilih' => $dompets->take(4),
             'recentTransactions' => $recentTransactions,
         ]);
@@ -199,5 +198,29 @@ class DompetController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Withdraw berhasil.');
+    }
+
+    public function show(Dompet $dompet)
+    {
+        $transactions = Transaksi::with(['kategori', 'dompet'])
+            ->where('dompet_id', $dompet->id)
+            ->latest()
+            ->get()
+            ->map(function($transaction) {
+                // Get the type from the kategori relationship
+                $transaction->tipe = $transaction->kategori ? $transaction->kategori->tipe : null;
+                return $transaction;
+            });
+
+        // Calculate totals
+        $pemasukan = $transactions->where('tipe', 'pemasukan')->sum('nominal');
+        $pengeluaran = $transactions->where('tipe', 'pengeluaran')->sum('nominal');
+
+        return view('dompet.detail', [
+            'dompet' => $dompet,
+            'transactions' => $transactions,
+            'total_pemasukan' => $pemasukan,
+            'total_pengeluaran' => $pengeluaran,
+        ]);
     }
 }

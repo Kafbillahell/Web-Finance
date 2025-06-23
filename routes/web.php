@@ -36,7 +36,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::resource('kategori', KategoriController::class)->except(['show']);
     Route::get('/kategori/{id}', [KategoriController::class, 'show'])->name('kategori.detail');
     Route::resource('transaksi', TransaksiController::class);
-    Route::resource('dompet', DompetController::class);
+    Route::resource('dompet', DompetController::class)->except(['show']);
+    Route::get('/dompet/{dompet}', [DompetController::class, 'show'])->name('dompet.show');
     Route::resource('tabungan', TabunganController::class);
     Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');
     Route::post('/tabungan/{id}/withdraw-saldo', [TabunganController::class, 'withdrawSaldo'])->name('tabungan.withdrawSaldo');
@@ -49,6 +50,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/dompet/{id}/withdraw', [DompetController::class, 'withdraw'])->name('dompet.withdraw');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
     Route::get('/export/transaksi/{type}', [TransaksiController::class, 'exportTransaksi'])->name('export.transaksi');
+    Route::get('/transaksi/export/pdf/{type?}', [TransaksiController::class, 'exportPdf'])->name('transaksi.export.pdf');
+   Route::get('/transaksi/pdf', [TransaksiController::class, 'exportPdf'])->name('transaksi.pdf');
 
 });
 

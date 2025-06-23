@@ -127,7 +127,7 @@ class TabunganController extends Controller
     public function edit(Tabungan $tabungan)
     {
         if ($tabungan->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
+            return view('error', ['code' => 403, 'message' => 'Unauthorized action.']);
         }
 
         $users = User::all();
