@@ -54,7 +54,6 @@
                                             {{ ucfirst($row->tipe) }}
                                         </span>
                                     </td>
-                                    <td>{{ $row->user->name ?? 'Unknown' }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ url("kategori/$row->id/edit") }}" class="btn btn-warning btn-sm">
