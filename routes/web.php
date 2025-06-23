@@ -35,7 +35,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::resource('kategori', KategoriController::class)->except(['show']);
     Route::resource('transaksi', TransaksiController::class);
-    Route::resource('dompet', DompetController::class);
+    Route::resource('dompet', DompetController::class)->except(['show']);
+    Route::get('/dompet/{dompet}', [DompetController::class, 'show'])->name('dompet.show');
     Route::resource('tabungan', TabunganController::class);
     Route::post('/tabungan/{id}/add-saldo', [TabunganController::class, 'addSaldo'])->name('tabungan.addSaldo');
     Route::post('/tabungan/{id}/withdraw-saldo', [TabunganController::class, 'withdrawSaldo'])->name('tabungan.withdrawSaldo');

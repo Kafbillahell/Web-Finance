@@ -158,14 +158,14 @@
                     @endphp
                     @forelse($dompet_terpilih ?? [] as $index => $dompet)
                     <div class="col-12">
-                        <div class="{{ $cardClasses[($index + 1) % count($cardClasses)] }}" onclick="showTransactions('{{ $dompet->id }}')" data-wallet-id="{{ $dompet->id }}">
+                        <div class="{{ $cardClasses[($index + 1) % count($cardClasses)] }}" onclick="window.location.href='{{ route('dompet.show', $dompet->id) }}'">
                             <div class="wallet-balance">Rp {{ number_format($dompet->saldo ?? 0, 0, ',', '.') }}</div>
                             <div class="wallet-name">{{ $dompet->nama ?? 'Wallet Name' }}</div>
                             <div class="mt-2">
                                 <form id="deleteForm-{{ $dompet->id }}" method="POST" action="{{ route('dompet.destroy', ['dompet' => $dompet->id]) }}" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="confirmDelete({{ $dompet->id }})">
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="event.stopPropagation(); confirmDelete({{ $dompet->id }})">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -192,26 +192,19 @@
         <div class="col-md-8">
             <div class="main-content">
                 <div class="row mb-4 g-4">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="stats-card">
                             <div class="stats-number text-primary">{{ $total_dompet ?? 0 }}</div>
                             <div class="stats-label">Total Wallets</div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="stats-card">
                             <div class="stats-number text-success">Rp {{ number_format($total_saldo ?? 0, 0, ',', '.') }}</div>
                             <div class="stats-label">Total Balance</div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="stats-card">
-                            <div class="stats-number text-warning">{{ $jenis_dompet ?? 0 }}</div>
-                            <div class="stats-label">Wallet Types</div>
-                        </div>
-                    </div>
                 </div>
-
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
