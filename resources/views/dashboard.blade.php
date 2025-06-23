@@ -91,8 +91,11 @@
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="{{ $type }}Amount" class="form-label">Jumlah {{ ucfirst($type) }}</label>
-                                <input type="text" id="{{ $type }}AmountFormatted" class="form-control format-saldo" placeholder="Misal: 50.000" required>
-                                <input type="hidden" name="amount" id="{{ $type }}Amount">
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" id="{{ $type }}AmountFormatted" class="form-control format-saldo" placeholder="Misal: 50.000" required>
+                                    <input type="hidden" name="amount" id="{{ $type }}Amount">
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="dompet_id_{{ $type }}" class="form-label">Pilih Dompet</label>

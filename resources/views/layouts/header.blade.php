@@ -1,3 +1,8 @@
+<style>
+    .logo-text {
+        text-decoration: none !important;
+    }
+</style>
 <header class="topbar" data-navbarbg="skin6">
     <nav class="navbar top-navbar navbar-expand-md">
         <div class="navbar-header" data-logobg="skin6">
