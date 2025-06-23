@@ -34,6 +34,7 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::delete('/profile', [DashboardController::class, 'destroyProfile'])->name('profile.delete');
 
     Route::resource('kategori', KategoriController::class)->except(['show']);
+    Route::get('/kategori/{id}', [KategoriController::class, 'show'])->name('kategori.detail');
     Route::resource('transaksi', TransaksiController::class);
     Route::resource('dompet', DompetController::class);
     Route::resource('tabungan', TabunganController::class);

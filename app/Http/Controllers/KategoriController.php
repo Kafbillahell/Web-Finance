@@ -22,7 +22,7 @@ class KategoriController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|string|max:255|unique:kategori,nama',
             'tipe' => 'required|in:pemasukan,pengeluaran',
         ]);
 
@@ -33,6 +33,12 @@ class KategoriController extends Controller
         ]);
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan');
+    }
+
+    public function show($id)
+    {
+        $kategori = Kategori::with('transaksi')->findOrFail($id);
+        return view('kategori.detail', compact('kategori'));
     }
 
     public function edit(Kategori $kategori)
