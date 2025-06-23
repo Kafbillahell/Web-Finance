@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Dompet;
 use App\Models\Kategori;
 use App\Models\Transaksi;
