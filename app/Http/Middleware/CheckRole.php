@@ -22,7 +22,7 @@ class CheckRole
 
         // Cek apakah role user sesuai dengan yang dibutuhkan
         if (Auth::user()->role !== $role) {
-            abort(403, 'Unauthorized role.');
+            return response(view('error', ['code' => 403, 'message' => 'Unauthorized role.']), 403);
         }
 
         return $next($request);

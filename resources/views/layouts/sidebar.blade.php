@@ -1,31 +1,90 @@
-<nav class="pc-sidebar">
-    <div class="navbar-wrapper">
-        <div class="m-header flex items-center py-4 px-6 h-header-height">
-            <a href="{{route('dashboard')}}" class="b-brand flex items-center gap-3">
-                <!-- ========   Change your logo from here   ============ -->
-                <img src="{{asset('assets/images/logo-white.svg')}}" class="img-fluid logo logo-lg" alt="logo" />
-                <img src="{{asset('assets/images/favicon.svg')}}" class="img-fluid logo logo-sm" alt="logo" />
-            </a>
-        </div>
-        <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
-            <ul class="pc-navbar">
-                <li class="pc-item pc-caption">
-                    <label>Navigation</label>
-                </li>
-                <li class="pc-item">
-                <li class="pc-item">
-                    <a href="{{route('dashboard')}}" class="pc-link">
-                        <span class="pc-micon">
-                            <i data-feather="home"></i>
-                        </span>
-                        <span class="pc-mtext">Dashboard</span>
+@php
+$role = auth()->user()->role;
+@endphp
+
+<style>
+    .sidebar-link {
+        text-decoration: none !important;
+    }
+</style>
+<aside class="left-sidebar" data-sidebarbg="skin6">
+    <div class="scroll-sidebar" data-sidebarbg="skin6">
+        <nav class="sidebar-nav">
+            <ul id="sidebarnav">
+                @if($role === 'user')
+                <li class="sidebar-item">
+                    <a class="sidebar-link sidebar-link" href="{{ route('dashboard') }}" aria-expanded="false">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="hide-menu">Dashboard</span>
                     </a>
                 </li>
-                <li class="pc-item pc-caption">
-                    <label>Sections</label>
-                    <i data-feather="feather"></i>
+                @endif
+                @if($role === 'admin')
+                <li class="sidebar-item">
+                    <a class="sidebar-link sidebar-link" href="{{ route('admin.dashboard') }}" aria-expanded="false">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="hide-menu">Dashboard</span>
+                    </a>
                 </li>
+                @endif
+                <li class="list-divider"></li>
+                @if($role === 'user')
+                <li class="nav-small-cap"><span class="hide-menu">Money Management</span></li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('tabungan.index') }}" aria-expanded="false">
+                        <i class="fas fa-piggy-bank"></i>
+                        <span class="hide-menu">Tabungan</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('kategori.index') }}" aria-expanded="false">
+                        <i class="fas fa-tag"></i>
+                        <span class="hide-menu">Kategori</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('dompet.index') }}" aria-expanded="false">
+                        <i class="fas fa-credit-card"></i>
+                        <span class="hide-menu">Dompet</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('transaksi.index') }}" aria-expanded="false">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span class="hide-menu">Transaksi</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('transaksi.tabungan') }}" aria-expanded="false">
+                        <i class="fas fa-history"></i>
+                        <span class="hide-menu">Transaksi Tabungan</span>
+                    </a>
+                </li>
+                <li class="list-divider"></li>
+                @endif
+
+                @if($role === 'admin')
+                <li class="nav-small-cap"><span class="hide-menu">User Management</span></li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                        <i class="fas fa-users"></i>
+                        <span class="hide-menu">Users</span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse first-level base-level-line">
+                        <li class="sidebar-item">
+                            <a href="{{ route('users.index') }}" class="sidebar-link">
+                                <span class="hide-menu">All Users</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ route('users.create') }}" class="sidebar-link">
+                                <span class="hide-menu">Add User</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
             </ul>
-        </div>
+        </nav>
     </div>
-</nav>
+</aside>
